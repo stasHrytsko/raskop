@@ -8,42 +8,49 @@ function hide(){ ovl.innerHTML = ''; }
 
 // Конец захода: уровень ещё не закрыт и заходы остались
 function showDiveEnd(died, gain){
-  const left = S.quota - S.prog;
   show(died
     ? `<h2>💀 Ловушка!</h2>
-       <div class="big bad">−${S.pack}</div>
-       <p>Рюкзак сгорел. До цели ещё <b>${left} 💰</b>, осталось заходов: <b>${S.dives}</b>.</p>
+       <p>Весь прогресс уровня сгорел. Осталось заходов: <b>${S.dives}</b>.<br>
+          Цель уровня <b>${S.quota} 🪙</b> придётся набрать заново.</p>
        <button class="btn btn-go" id="go">Новый заход</button>`
     : `<h2>Ушёл вовремя</h2>
-       <div class="big ok">+${gain}</div>
-       <p>До цели ещё <b>${left} 💰</b>, осталось заходов: <b>${S.dives}</b>.</p>
+       <div class="big ok">+${gain} 🪙</div>
+       <p>Прогресс уровня: <b>${S.prog} / ${S.quota} 🪙</b>. Осталось заходов: <b>${S.dives}</b>.</p>
        <button class="btn btn-go" id="go">Новый заход</button>`);
   $('go').onclick = () => { hide(); nextDive(); };
 }
 
-// ПОБЕДА — цель уровня взята
-function showWin(){
-  const last = S.level >= LEVELS.length - 1;
-  show(`<h2>🏆 Поздравляю, прошёл!</h2>
-    <div class="big ok">${S.prog} / ${S.quota} 💰</div>
-    <p>Уровень <b>${S.level + 1}</b> ${last ? '— последний, ты прошёл всю экспедицию!' : 'закрыт.'}</p>
-    ${last ? '' : `<button class="btn btn-go" id="next">Уровень ${S.level + 2} →</button>`}
-    <button class="btn btn-ghost" id="retry">Ещё раз</button>
-    <button class="btn btn-ghost" id="toLv">К уровням</button>`);
-  if(!last) $('next').onclick = () => { hide(); startLevel(S.level + 1); };
-  $('retry').onclick = () => { hide(); startLevel(S.level); };
-  $('toLv').onclick  = () => { hide(); showScreen('levels'); };
+// Уровень пройден — переход к следующему
+function showLevelClear(n){
+  show(`<h2>✨ Уровень ${n + 1} пройден</h2>
+    <div class="big ok">${S.prog} / ${S.quota} 🪙</div>
+    <p>Квота закрыта. Дальше сложнее.</p>
+    <button class="btn btn-go" id="next">Уровень ${n + 2} →</button>`);
+  $('next').onclick = () => { hide(); startLevel(n + 1); };
 }
 
-// ПОРАЖЕНИЕ — заходы кончились, цель не взята
-function showLose(died){
-  show(`<h2>${died ? '💀 Рюкзак сгорел' : '⏳ Заходы кончились'}</h2>
-    <p>${died
-        ? 'Последний заход подорвался на ловушке.'
-        : `Не хватило <b>${S.quota - S.prog} 💰</b> до цели.`}
-       <br>Собрано: <b>${S.prog} / ${S.quota} 💰</b></p>
-    <button class="btn btn-go" id="retry">Попробовать снова</button>
-    <button class="btn btn-ghost" id="toLv">К уровням</button>`);
-  $('retry').onclick = () => { hide(); startLevel(S.level); };
-  $('toLv').onclick  = () => { hide(); showScreen('levels'); };
+// ПОБЕДА — пройдены все 9 уровней забега
+function showRunWin(){
+  show(`<h2>🏆 Забег пройден!</h2>
+    <div class="big ok">9 / 9</div>
+    <p>Ты прошёл всю экспедицию. Рекорд: уровень <b>${best}</b>.</p>
+    <button class="btn btn-go" id="again">Сыграть заново</button>
+    <button class="btn btn-ghost" id="toMap">К забегу</button>`);
+  $('again').onclick = () => { hide(); startRun(); };
+  $('toMap').onclick = () => { hide(); run = null; gotoMap(); };
+}
+
+// ПОРАЖЕНИЕ — забег окончен (reason: 'trap' | 'coins')
+function showRunOver(reason){
+  const reached = run.level + 1;
+  const why = reason === 'trap'
+    ? 'ловушка сожгла прогресс уровня'
+    : 'не хватило монет за 3 захода';
+  show(`<h2>Забег окончен</h2>
+    <div class="big amb">Уровень ${reached}</div>
+    <p>Лучший рекорд: уровень <b>${best}</b>.<br>Причина: <b>${why}</b>.</p>
+    <button class="btn btn-go" id="again">Начать заново</button>
+    <button class="btn btn-ghost" id="toMap">К забегу</button>`);
+  $('again').onclick = () => { hide(); startRun(); };
+  $('toMap').onclick = () => { hide(); run = null; gotoMap(); };
 }

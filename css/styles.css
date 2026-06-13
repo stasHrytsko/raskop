@@ -28,8 +28,7 @@ body{
 .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
 .lvl{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--sand-dim)}
 .lvl b{color:var(--sand)}
-.dives{font-size:15px;letter-spacing:3px}
-.dives .on{color:var(--amber)} .dives .off{color:#4a3b2e}
+.dives{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--sand-dim)}
 
 .quota{margin-bottom:12px}
 .quota-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sand-dim);margin-bottom:5px}
@@ -125,6 +124,8 @@ body{
 .tagline{font-size:14px;color:var(--sand-dim);max-width:280px;margin-bottom:22px;line-height:1.45}
 .screen-center .rules{max-width:330px}
 .screen-h{font-size:22px;font-weight:800;text-align:center;margin:6px 0 4px}
+.record{text-align:center;font-size:13px;color:var(--sand-dim);margin-bottom:14px}
+#mapActions{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 
 /* ---------- легенда сложности ---------- */
 .legend{display:flex;justify-content:center;gap:14px;font-size:12px;margin-bottom:18px;color:var(--sand-dim)}
@@ -144,11 +145,16 @@ body{
   transition:transform .08s ease;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.04), 0 2px 0 rgba(0,0,0,.35);
 }
-.lv:active{transform:scale(.93)}
+.lv{cursor:default}
 .lv.easy{border-color:var(--green);color:#88dca4}
 .lv.med{border-color:var(--amber);color:var(--amber)}
 .lv.hard{border-color:var(--danger);color:#e98b83}
-#screen-levels .btn-ghost{margin-top:18px}
+.lv.lock{opacity:.32}
+.lv.done{opacity:.9}
+.lv.done::after{content:"";position:absolute}
+.lv.current{box-shadow:inset 0 0 0 2px var(--sand), 0 2px 0 rgba(0,0,0,.35);transform:scale(1.05)}
+.lv{position:relative}
+#screen-levels .btn-ghost{margin-top:14px}
 
 /* ---------- кнопка «← УР. N» ---------- */
 .btn-back{

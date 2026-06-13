@@ -1,23 +1,37 @@
 // ───────────────────────────────────────────────
-//  Состояние и игровой цикл
+//  Состояние, забег и игровой цикл
 // ───────────────────────────────────────────────
-let S = null;
+let best = 0;      // лучший рекорд (до какого уровня дошёл), 1..9
+let run  = null;   // текущий забег: {level} или null
+let S    = null;   // состояние текущего уровня/захода
 
-// Запуск выбранного уровня n (0-индекс в LEVELS)
+// ─── рекорд ───
+function loadBest(){ best = parseInt(localStorage.getItem(REC_KEY) || '0', 10) || 0; }
+function saveBest(){ try { localStorage.setItem(REC_KEY, String(best)); } catch(e){} }
+function bumpBest(reached){ if(reached > best){ best = reached; saveBest(); } }
+
+// ─── забег ───
+function startRun(){
+  run = {level: 0};
+  startLevel(0);
+  showScreen('game');
+}
+
+// Запуск уровня n (0-индекс) внутри забега
 function startLevel(n){
-  const cfg = LEVELS[n];
+  run.level = n;
+  bumpBest(n + 1);                 // «дошёл до уровня n+1»
   S = {
-    level: n, quota: cfg.quota, traps: cfg.traps,
-    divesMax: cfg.dives, dives: cfg.dives, prog: 0,
-    field: newField(cfg.traps), pack: 0, reveals: 0, live: true, firstTap: true,
+    quota: quotaFor(n), divesMax: DIVES, dives: DIVES, prog: 0,
+    field: newField(), pack: 0, reveals: 0, live: true, firstTap: true,
   };
   render();
   renderGrid();
 }
 
-// Новый заход на том же уровне (свежее поле, сброс рюкзака)
+// Новый заход на том же уровне (свежее поле, рюкзак и множитель с нуля)
 function nextDive(){
-  S.field = newField(S.traps);
+  S.field = newField();
   S.pack = 0;
   S.reveals = 0;
   S.live = true;
@@ -34,37 +48,44 @@ function tap(i){
 
   // Первое вскрытие захода всегда безопасно
   if(S.firstTap && cell.trap){
-    const free = S.field.findIndex(c => !c.trap && !c.open && !c.val);
+    const free = S.field.findIndex(c => !c.trap && !c.open && !c.coin);
     cell.trap = false;
     S.field[free === -1 ? 0 : free].trap = true;
   }
   S.firstTap = false;
   cell.open = true;
 
-  if(cell.trap){
-    S.live = false;
-    navigator.vibrate && navigator.vibrate([60, 40, 120]);
-    renderGrid();
-    render();
-    setTimeout(() => endDive(true), 650);
-    return;
-  }
+  if(cell.trap) return onTrap();
 
   S.reveals++;
-  if(cell.val){
-    S.pack += cell.val;
-    flyCoin(i, cell.val);
-  }
+  if(cell.coin){ S.pack++; flyCoin(i); }
   renderGrid();
   render();
 
-  // Все безопасные клетки вскрыты — автоматический выход
-  if(S.field.every(c => c.trap || c.open)) setTimeout(() => leave(), 350);
+  // Все монеты собраны — заход завершается автоматически (безопасно)
+  if(S.pack >= COINS) setTimeout(() => endDiveSafe(), 350);
 }
 
-// Добровольный выход — добыча × множитель уходит в прогресс уровня
+// Ловушка: весь прогресс уровня сгорает, поле раскрывается
+function onTrap(){
+  S.live = false;
+  S.prog = 0;
+  S.field.forEach(c => c.open = true);
+  navigator.vibrate && navigator.vibrate([60, 40, 120]);
+  renderGrid();
+  render();
+  setTimeout(() => endDive(true, 0), 750);
+}
+
+// Ручной выход по кнопке «Уйти»
 function leave(){
-  if(!S.live || (S.pack === 0 && S.reveals === 0)) return;
+  if(!S.live || S.pack === 0) return;
+  endDiveSafe();
+}
+
+// Безопасное завершение захода: рюкзак × множитель → прогресс уровня
+function endDiveSafe(){
+  if(!S.live) return;
   S.live = false;
   const gain = S.pack * mult();
   S.prog += gain;
@@ -72,13 +93,24 @@ function leave(){
   setTimeout(() => endDive(false, gain), 250);
 }
 
-// Итог захода: уровень взят? заходы кончились? иначе — следующий заход
+// Итог захода: квота взята? заходы кончились? иначе — следующий заход
 function endDive(died, gain){
   S.dives--;
-  if(S.prog >= S.quota){ return showWin(); }
-  if(S.dives <= 0){ return showLose(died); }
+  if(S.prog >= S.quota) return clearLevel();
+  if(S.dives <= 0) return runOver(died ? 'trap' : 'coins');
   showDiveEnd(died, gain);
 }
 
-// Старт приложения: навигация на странице правил
+// Уровень закрыт
+function clearLevel(){
+  const n = run.level;
+  if(n >= LEVELS_COUNT - 1){ bumpBest(LEVELS_COUNT); return showRunWin(); }
+  showLevelClear(n);
+}
+
+// Забег окончен (reason: 'trap' | 'coins')
+function runOver(reason){ showRunOver(reason); }
+
+// ─── старт приложения ───
+loadBest();
 initNav();

@@ -12,22 +12,24 @@
   <!-- ═══ СТРАНИЦА 1 — Название + правила ═══ -->
   <section id="screen-rules" class="screen screen-center">
     <div class="title">РАСКОП</div>
-    <div class="tagline">Копай за сокровищами — и реши, когда вовремя уйти</div>
+    <div class="tagline">Копай за монетами — и реши, когда жадность пора остановить</div>
     <div class="rules">
-      <div><span class="i">👆</span><span>Вскрывай клетки. Цифра — сколько ловушек 💀 среди соседей.</span></div>
-      <div><span class="i">💰</span><span>Добыча падает в рюкзак. Наступил на ловушку — рюкзак сгорает.</span></div>
-      <div><span class="i">🔥</span><span>Чем дольше копаешь за заход, тем выше множитель: 5 клеток — ×2, 8 — ×3.</span></div>
-      <div><span class="i">🚪</span><span>«Уйти» можно в любой момент — добыча сохранится.</span></div>
-      <div><span class="i">🎯</span><span>Собери цель уровня за отведённые заходы.</span></div>
+      <div><span class="i">👆</span><span>Вскрывай клетки. Цифра — сколько ловушек 💀 среди 8 соседей.</span></div>
+      <div><span class="i">🪙</span><span>На поле 4 монеты. Собрал — в рюкзак. Наступил на ловушку — весь прогресс уровня сгорает.</span></div>
+      <div><span class="i">🔥</span><span>Множитель за заход: 6 вскрытых клеток — ×2, 9 — ×3.</span></div>
+      <div><span class="i">🚪</span><span>«Уйти» в любой момент — рюкзак × множитель уходит в прогресс уровня.</span></div>
+      <div><span class="i">🎯</span><span>Закрой квоту уровня за 3 захода. В забеге 9 уровней.</span></div>
     </div>
-    <button class="btn btn-go" id="toLevels">Выбрать уровень</button>
+    <button class="btn btn-go" id="toLevels">Играть</button>
   </section>
 
-  <!-- ═══ СТРАНИЦА 2 — Выбор уровня ═══ -->
+  <!-- ═══ СТРАНИЦА 2 — Карта забега ═══ -->
   <section id="screen-levels" class="screen">
-    <h1 class="screen-h">Выбери уровень</h1>
+    <h1 class="screen-h">Забег</h1>
+    <div class="record" id="record"></div>
     <div class="legend"><span class="lg easy">Легко</span><span class="lg med">Средне</span><span class="lg hard">Сложно</span></div>
     <div class="levels" id="levels"></div>
+    <div id="mapActions"></div>
     <button class="btn btn-ghost" id="toRules">← Назад</button>
   </section>
 
@@ -35,10 +37,10 @@
   <section id="screen-game" class="screen">
     <div class="top">
       <button class="btn-back" id="toLevels2">← УР. <b id="lvl">1</b></button>
-      <div class="dives" id="dives"></div>
+      <div class="dives" id="dives">Заход 1/3</div>
     </div>
     <div class="quota">
-      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">25</span> 💰</b></div>
+      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">6</span> 🪙</b></div>
       <div class="bar"><i id="qbar"></i></div>
     </div>
 
@@ -49,11 +51,11 @@
         <div class="sum">🎒 <span id="pack">0</span> <small>× <span id="multTxt">1</span> = <span id="total">0</span></small></div>
         <div class="mult" id="mult">×1</div>
       </div>
-      <div class="fuse"><i id="fuse"></i><span class="tick" style="left:55.5%"></span><span class="tick" style="left:88.8%"></span></div>
+      <div class="fuse"><i id="fuse"></i><span class="tick" style="left:66.6%"></span><span class="tick" style="left:100%"></span></div>
       <div class="fuse-hint" id="fuseHint"></div>
     </div>
 
-    <button class="btn btn-leave" id="leaveBtn">Уйти и забрать 0</button>
+    <button class="btn btn-leave" id="leaveBtn">Рюкзак пуст</button>
   </section>
 
 </div>

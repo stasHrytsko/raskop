@@ -1,24 +1,24 @@
 // ───────────────────────────────────────────────
 //  Раскоп — игровые константы (весь баланс здесь)
+//  Значения по concept.txt → «Баланс первого прототипа»
 // ───────────────────────────────────────────────
-const SIZE = 6;   // поле SIZE × SIZE
-const TH2 = 5;    // вскрытий подряд для множителя ×2
-const TH3 = 8;    // вскрытий подряд для множителя ×3
+const SIZE = 6;            // поле SIZE × SIZE
+const COINS = 4;           // монет на заход (каждая = +1)
+const TRAPS = 4;           // ловушек на заход
 
-// 9 уровней, сетка 3×3:
-//   1–3 — Легко (зелёные), 4–6 — Средне (янтарные), 7–9 — Сложно (красные)
-// traps — ловушек на поле, quota — цель уровня, dives — заходов на уровень.
-const LEVELS = [
-  {traps:3, quota:16, dives:3},  // 1
-  {traps:3, quota:22, dives:3},  // 2
-  {traps:4, quota:28, dives:3},  // 3
-  {traps:4, quota:32, dives:3},  // 4
-  {traps:5, quota:36, dives:3},  // 5
-  {traps:5, quota:40, dives:3},  // 6
-  {traps:6, quota:40, dives:3},  // 7
-  {traps:6, quota:46, dives:3},  // 8
-  {traps:7, quota:52, dives:3},  // 9
-];
+const LEVELS_COUNT = 9;    // уровней в одном забеге
+const QUOTA_START = 6;     // квота первого уровня (в монетах)
+const QUOTA_STEP = 2;      // +монет к квоте за каждый следующий уровень
+const DIVES = 3;           // заходов на уровень
+
+const TH2 = 6;             // безопасных вскрытий за заход для ×2
+const TH3 = 9;             // безопасных вскрытий за заход для ×3
+
+const REC_KEY = 'raskop_best';   // ключ рекорда в localStorage
+
+// Квота уровня n (0-индекс) и его тир сложности для карты забега
+const quotaFor = n => QUOTA_START + QUOTA_STEP * n;
+const tierFor  = n => n < 3 ? 'easy' : n < 6 ? 'med' : 'hard';
 
 // Маленький DOM-хелпер, общий для всех модулей
 const $ = id => document.getElementById(id);
