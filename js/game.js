@@ -46,12 +46,8 @@ function tap(i){
   const cell = S.field[i];
   if(cell.open) return;
 
-  // Первое вскрытие захода всегда безопасно
-  if(S.firstTap && cell.trap){
-    const free = S.field.findIndex(c => !c.trap && !c.open && !c.coin);
-    cell.trap = false;
-    S.field[free === -1 ? 0 : free].trap = true;
-  }
+  // Первое вскрытие захода — честный старт: 0 ловушек среди соседей (FIRST_TAP_BLANK)
+  if(S.firstTap) clearStart(i);
   S.firstTap = false;
   cell.open = true;
 

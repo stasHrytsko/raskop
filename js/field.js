@@ -37,10 +37,10 @@ function makeRaw(traps){
   return cells;
 }
 
-// Подсказки только 1–3: ни одна безопасная клетка не касается >3 ловушек
+// Подсказки только 1..MAX_CLUE: ни одна безопасная клетка не касается >MAX_CLUE ловушек
 function safeNumbersOK(cells){
   for(let i = 0; i < cells.length; i++)
-    if(!cells[i].trap && countTraps(cells, i) > 3) return false;
+    if(!cells[i].trap && countTraps(cells, i) > MAX_CLUE) return false;
   return true;
 }
 
@@ -71,7 +71,25 @@ function newField(traps){
 // Ловушки вокруг клетки i в текущем поле (для отрисовки)
 function trapCount(i){ return countTraps(S.field, i); }
 
+// FIRST_TAP_BLANK: гарантия честного старта — у клетки i 0 ловушек среди соседей.
+// Любые ловушки в зоне старта (сама клетка + 8 соседей) переносятся на случайные
+// свободные клетки вне этой зоны.
+function clearStart(i){
+  if(!FIRST_TAP_BLANK) return;
+  const zone = new Set([i, ...neigh(i)]);
+  const free = [];
+  S.field.forEach((c, j) => { if(!zone.has(j) && !c.trap && !c.coin) free.push(j); });
+  shuffle(free);
+  let f = 0;
+  zone.forEach(j => {
+    if(S.field[j].trap && f < free.length){
+      S.field[j].trap = false;
+      S.field[free[f++]].trap = true;
+    }
+  });
+}
+
 // Текущий множитель жадности по числу безопасных вскрытий за заход
 function mult(){
-  return S.reveals >= TH3 ? 3 : S.reveals >= TH2 ? 2 : 1;
+  return S.reveals >= TH4 ? 4 : S.reveals >= TH3 ? 3 : S.reveals >= TH2 ? 2 : 1;
 }

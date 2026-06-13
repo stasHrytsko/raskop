@@ -75,7 +75,7 @@ body{
 .pack-row .sum{font-family:ui-monospace,Menlo,monospace;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
 .pack-row .sum small{font-size:13px;color:var(--sand-dim);font-weight:600}
 .mult{font-size:14px;font-weight:800;color:var(--sand-dim)}
-.mult.x2{color:var(--amber)} .mult.x3{color:var(--ember)}
+.mult.x2{color:var(--amber)} .mult.x3{color:var(--ember)} .mult.x4{color:var(--danger)}
 .fuse{height:6px;background:#15100d;border-radius:3px;margin-top:9px;position:relative;overflow:hidden}
 .fuse i{display:block;height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--amber),var(--ember));transition:width .3s ease}
 .fuse .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:#5c4a36}

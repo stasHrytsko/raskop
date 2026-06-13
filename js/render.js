@@ -56,10 +56,12 @@ function render(){
   $('total').textContent = S.pack * m;
   const me = $('mult');
   me.textContent = '×' + m;
-  me.className = 'mult' + (m === 3 ? ' x3' : m === 2 ? ' x2' : '');
+  me.className = 'mult' + (m === 4 ? ' x4' : m === 3 ? ' x3' : m === 2 ? ' x2' : '');
 
-  $('fuse').style.width = Math.min(100, S.reveals / TH3 * 100) + '%';
-  $('fuseHint').innerHTML = m === 3 ? '<b>Максимальная жадность ×3</b>'
+  $('fuse').style.width = Math.min(100, S.reveals / TH4 * 100) + '%';
+  $('fuseHint').innerHTML =
+      m === 4 ? '<b>Максимальная жадность ×4</b>'
+    : m === 3 ? `Ещё <b>${TH4 - S.reveals}</b> клеток до <b>×4</b>`
     : m === 2 ? `Ещё <b>${TH3 - S.reveals}</b> клеток до <b>×3</b>`
     : `Ещё <b>${TH2 - S.reveals}</b> клеток до <b>×2</b>`;
 
