@@ -22,8 +22,8 @@ function startLevel(n){
   run.level = n;
   bumpBest(n + 1);                 // «дошёл до уровня n+1»
   S = {
-    quota: quotaFor(n), divesMax: DIVES, dives: DIVES, prog: 0,
-    field: newField(), pack: 0, reveals: 0, live: true, firstTap: true,
+    quota: quotaFor(n), traps: trapsFor(n), divesMax: DIVES, dives: DIVES, prog: 0,
+    field: newField(trapsFor(n)), pack: 0, reveals: 0, live: true, firstTap: true,
   };
   render();
   renderGrid();
@@ -31,7 +31,7 @@ function startLevel(n){
 
 // Новый заход на том же уровне (свежее поле, рюкзак и множитель с нуля)
 function nextDive(){
-  S.field = newField();
+  S.field = newField(S.traps);
   S.pack = 0;
   S.reveals = 0;
   S.live = true;

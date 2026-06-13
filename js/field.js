@@ -26,13 +26,13 @@ function countTraps(cells, i){
   return neigh(i).filter(j => cells[j].trap).length;
 }
 
-// Сырое поле: COINS монет + TRAPS ловушек, остальное пусто
-function makeRaw(){
+// Сырое поле: COINS монет + `traps` ловушек, остальное пусто
+function makeRaw(traps){
   const cells = Array.from({length: SIZE * SIZE}, () => ({trap:false, coin:false, open:false}));
   const idx = [...cells.keys()];
   shuffle(idx);
   let p = 0;
-  for(let i = 0; i < TRAPS; i++) cells[idx[p++]].trap = true;
+  for(let i = 0; i < traps; i++) cells[idx[p++]].trap = true;
   for(let i = 0; i < COINS; i++) cells[idx[p++]].coin = true;
   return cells;
 }
@@ -51,16 +51,17 @@ function coinSpreadOK(cells){
   return lowRisk >= 2;
 }
 
-// Генерирует сбалансированное поле; мягко деградирует, если идеал не найден
-function newField(){
-  let last = makeRaw();
-  for(let a = 0; a < 400; a++){
-    const c = makeRaw();
+// Генерирует сбалансированное поле с `traps` ловушками;
+// мягко деградирует, если идеал не найден
+function newField(traps){
+  let last = makeRaw(traps);
+  for(let a = 0; a < 600; a++){
+    const c = makeRaw(traps);
     last = c;
     if(safeNumbersOK(c) && coinSpreadOK(c)) return c;
   }
-  for(let a = 0; a < 400; a++){          // ослабляем: только ограничение цифр ≤3
-    const c = makeRaw();
+  for(let a = 0; a < 600; a++){          // ослабляем: только ограничение цифр ≤3
+    const c = makeRaw(traps);
     last = c;
     if(safeNumbersOK(c)) return c;
   }
