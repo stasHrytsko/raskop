@@ -1,26 +1,12 @@
 // ───────────────────────────────────────────────
-//  Попапы и оверлеи
+//  Попапы (оверлеи поверх игровой страницы)
 // ───────────────────────────────────────────────
 const ovl = $('ovl');
 
 function show(html){ ovl.innerHTML = `<div class="ovl"><div class="card">${html}</div></div>`; }
 function hide(){ ovl.innerHTML = ''; }
 
-// Стартовый экран с правилами
-function showIntro(){
-  show(`<div class="subtitle">прототип</div>
-    <div class="title">РАСКОП</div>
-    <div class="rules">
-      <div><span class="i">👆</span><span>Вскрывай клетки. Цифра — сколько ловушек вокруг.</span></div>
-      <div><span class="i">💰</span><span>Монеты падают в рюкзак. Наступил на ловушку 💀 — рюкзак сгорает.</span></div>
-      <div><span class="i">🔥</span><span>Чем дольше копаешь за заход, тем выше множитель: 5 клеток — ×2, 8 — ×3.</span></div>
-      <div><span class="i">🚪</span><span>«Уйти» можно в любой момент — добыча сохраняется. Собери цель уровня за 3 захода.</span></div>
-    </div>
-    <button class="btn btn-go" id="go">Копать</button>`);
-  $('go').onclick = () => { hide(); };
-}
-
-// Конец захода (смерть или добровольный выход), но уровень ещё не закрыт
+// Конец захода: уровень ещё не закрыт и заходы остались
 function showDiveEnd(died, gain){
   const left = S.quota - S.prog;
   show(died
@@ -35,28 +21,29 @@ function showDiveEnd(died, gain){
   $('go').onclick = () => { hide(); nextDive(); };
 }
 
-// Уровень пройден
-function showLevelUp(){
-  const surplus = S.prog - S.quota;
-  show(`<h2>✨ Уровень пройден</h2>
-    <div class="big ok">${S.prog} / ${S.quota}</div>
-    <p>${surplus > 0 ? `Излишек <b>+${surplus} 💰</b> переходит дальше.` : 'Ровно по плану.'}</p>
-    <button class="btn btn-go" id="go">Уровень ${S.level + 1} →</button>`);
-  $('go').onclick = () => {
-    hide();
-    S.level++;
-    S.quota = QUOTA0 + QUOTA_STEP * (S.level - 1);
-    S.prog = Math.max(0, surplus);
-    S.dives = DIVES;
-    nextDive();
-  };
+// ПОБЕДА — цель уровня взята
+function showWin(){
+  const last = S.level >= LEVELS.length - 1;
+  show(`<h2>🏆 Поздравляю, прошёл!</h2>
+    <div class="big ok">${S.prog} / ${S.quota} 💰</div>
+    <p>Уровень <b>${S.level + 1}</b> ${last ? '— последний, ты прошёл всю экспедицию!' : 'закрыт.'}</p>
+    ${last ? '' : `<button class="btn btn-go" id="next">Уровень ${S.level + 2} →</button>`}
+    <button class="btn btn-ghost" id="retry">Ещё раз</button>
+    <button class="btn btn-ghost" id="toLv">К уровням</button>`);
+  if(!last) $('next').onclick = () => { hide(); startLevel(S.level + 1); };
+  $('retry').onclick = () => { hide(); startLevel(S.level); };
+  $('toLv').onclick  = () => { hide(); showScreen('levels'); };
 }
 
-// Экспедиция окончена (кончились заходы, цель не взята)
-function showGameOver(){
-  show(`<h2>Экспедиция окончена</h2>
-    <div class="big amb">Уровень ${S.level}</div>
-    <p>Не хватило <b>${S.quota - S.prog} 💰</b> до цели.<br>Всего добыто за игру: <b>${S.banked} 💰</b></p>
-    <button class="btn btn-go" id="go">Сыграть ещё</button>`);
-  $('go').onclick = () => { hide(); start(); };
+// ПОРАЖЕНИЕ — заходы кончились, цель не взята
+function showLose(died){
+  show(`<h2>${died ? '💀 Рюкзак сгорел' : '⏳ Заходы кончились'}</h2>
+    <p>${died
+        ? 'Последний заход подорвался на ловушке.'
+        : `Не хватило <b>${S.quota - S.prog} 💰</b> до цели.`}
+       <br>Собрано: <b>${S.prog} / ${S.quota} 💰</b></p>
+    <button class="btn btn-go" id="retry">Попробовать снова</button>
+    <button class="btn btn-ghost" id="toLv">К уровням</button>`);
+  $('retry').onclick = () => { hide(); startLevel(S.level); };
+  $('toLv').onclick  = () => { hide(); showScreen('levels'); };
 }

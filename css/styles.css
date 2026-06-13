@@ -9,6 +9,7 @@
   --ember:#E06A2B;
   --danger:#C8443A;
   --gem:#3EC6A8;
+  --green:#46B06A;
   --line:#3A2D24;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -115,3 +116,45 @@ body{
 .rules .i{flex:0 0 22px;text-align:center}
 .title{font-size:26px;font-weight:800;letter-spacing:.04em}
 .subtitle{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+
+/* ---------- screens / навигация ---------- */
+.screen{display:none}
+.screen.active{display:flex;flex-direction:column;flex:1 1 auto}
+.screen-center{justify-content:center;align-items:center;text-align:center}
+.screen-center .title{font-size:40px;letter-spacing:.06em;margin-bottom:6px}
+.tagline{font-size:14px;color:var(--sand-dim);max-width:280px;margin-bottom:22px;line-height:1.45}
+.screen-center .rules{max-width:330px}
+.screen-h{font-size:22px;font-weight:800;text-align:center;margin:6px 0 4px}
+
+/* ---------- легенда сложности ---------- */
+.legend{display:flex;justify-content:center;gap:14px;font-size:12px;margin-bottom:18px;color:var(--sand-dim)}
+.legend .lg{display:flex;align-items:center;gap:5px}
+.legend .lg::before{content:"";width:9px;height:9px;border-radius:50%}
+.legend .easy::before{background:var(--green)}
+.legend .med::before{background:var(--amber)}
+.legend .hard::before{background:var(--danger)}
+
+/* ---------- сетка уровней 3×3 ---------- */
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:auto}
+.lv{
+  aspect-ratio:1;border-radius:16px;border:1.5px solid var(--line);
+  background:var(--earth-2);color:var(--sand);
+  font-family:ui-monospace,Menlo,monospace;font-size:26px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:transform .08s ease;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.04), 0 2px 0 rgba(0,0,0,.35);
+}
+.lv:active{transform:scale(.93)}
+.lv.easy{border-color:var(--green);color:#88dca4}
+.lv.med{border-color:var(--amber);color:var(--amber)}
+.lv.hard{border-color:var(--danger);color:#e98b83}
+#screen-levels .btn-ghost{margin-top:18px}
+
+/* ---------- кнопка «← УР. N» ---------- */
+.btn-back{
+  background:transparent;border:none;color:var(--sand-dim);
+  font:inherit;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;padding:0;
+}
+.btn-back b{color:var(--sand)}
+.btn-back:active{opacity:.6}

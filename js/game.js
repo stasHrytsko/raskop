@@ -3,11 +3,13 @@
 // ───────────────────────────────────────────────
 let S = null;
 
-// Новая игра с первого уровня
-function start(){
+// Запуск выбранного уровня n (0-индекс в LEVELS)
+function startLevel(n){
+  const cfg = LEVELS[n];
   S = {
-    level: 1, quota: QUOTA0, prog: 0, dives: DIVES, banked: 0,
-    field: newField(), pack: 0, reveals: 0, live: true, firstTap: true,
+    level: n, quota: cfg.quota, traps: cfg.traps,
+    divesMax: cfg.dives, dives: cfg.dives, prog: 0,
+    field: newField(cfg.traps), pack: 0, reveals: 0, live: true, firstTap: true,
   };
   render();
   renderGrid();
@@ -15,7 +17,7 @@ function start(){
 
 // Новый заход на том же уровне (свежее поле, сброс рюкзака)
 function nextDive(){
-  S.field = newField();
+  S.field = newField(S.traps);
   S.pack = 0;
   S.reveals = 0;
   S.live = true;
@@ -60,25 +62,23 @@ function tap(i){
   if(S.field.every(c => c.trap || c.open)) setTimeout(() => leave(), 350);
 }
 
-// Добровольный выход — добыча × множитель уходит в прогресс
+// Добровольный выход — добыча × множитель уходит в прогресс уровня
 function leave(){
   if(!S.live || (S.pack === 0 && S.reveals === 0)) return;
   S.live = false;
   const gain = S.pack * mult();
   S.prog += gain;
-  S.banked += gain;
   render();
   setTimeout(() => endDive(false, gain), 250);
 }
 
-// Итог захода: уровень закрыт? заходы кончились? иначе — следующий заход
+// Итог захода: уровень взят? заходы кончились? иначе — следующий заход
 function endDive(died, gain){
   S.dives--;
-  if(S.prog >= S.quota){ return showLevelUp(); }
-  if(S.dives <= 0){ return showGameOver(); }
+  if(S.prog >= S.quota){ return showWin(); }
+  if(S.dives <= 0){ return showLose(died); }
   showDiveEnd(died, gain);
 }
 
-// Старт
-start();
-showIntro();
+// Старт приложения: навигация на странице правил
+initNav();

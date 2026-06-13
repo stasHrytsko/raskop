@@ -1,5 +1,5 @@
 // ───────────────────────────────────────────────
-//  Отрисовка поля и HUD
+//  Отрисовка поля и HUD (страница 3)
 // ───────────────────────────────────────────────
 const grid = $('grid');
 
@@ -44,11 +44,11 @@ function renderGrid(){
 
 // Перерисовка HUD: уровень, заходы, прогресс, рюкзак, фитиль, кнопка
 function render(){
-  $('lvl').textContent = S.level;
+  $('lvl').textContent = S.level + 1;
   $('quota').textContent = S.quota;
   $('prog').textContent = S.prog;
   $('qbar').style.width = Math.min(100, S.prog / S.quota * 100) + '%';
-  $('dives').innerHTML = Array.from({length: DIVES}, (_, k) => `<span class="${k < S.dives ? 'on' : 'off'}">●</span>`).join('');
+  $('dives').innerHTML = Array.from({length: S.divesMax}, (_, k) => `<span class="${k < S.dives ? 'on' : 'off'}">●</span>`).join('');
   $('pack').textContent = S.pack;
 
   const m = mult();

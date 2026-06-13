@@ -2,13 +2,13 @@
 //  Поле: генерация, соседи, подсчёт ловушек, множитель
 // ───────────────────────────────────────────────
 
-// Генерирует новое поле: ловушки + добыча (6×🪙, 3×🧰, 1×💎 = 31)
-function newField(){
+// Генерирует новое поле: `traps` ловушек + добыча (6×🪙, 3×🧰, 1×💎 = 31)
+function newField(traps){
   const cells = Array.from({length: SIZE * SIZE}, () => ({trap:false, val:0, open:false}));
   const idx = [...cells.keys()];
   shuffle(idx);
   let p = 0;
-  for(let i = 0; i < TRAPS; i++) cells[idx[p++]].trap = true;
+  for(let i = 0; i < traps; i++) cells[idx[p++]].trap = true;
   for(let i = 0; i < 6; i++) cells[idx[p++]].val = 2;
   for(let i = 0; i < 3; i++) cells[idx[p++]].val = 4;
   cells[idx[p++]].val = 7;
