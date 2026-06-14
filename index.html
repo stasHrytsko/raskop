@@ -12,13 +12,13 @@
   <!-- ═══ СТРАНИЦА 1 — Название + правила ═══ -->
   <section id="screen-rules" class="screen screen-center">
     <div class="title">РАСКОП</div>
-    <div class="tagline">Копай за монетами — и реши, когда жадность пора остановить</div>
+    <div class="tagline">Вскрывай клетки за монетами — и реши, когда жадность пора остановить</div>
     <div class="rules">
-      <div><span class="i">👆</span><span>Вскрывай клетки. Цифра — сколько ловушек 💀 среди 8 соседей.</span></div>
-      <div><span class="i">🪙</span><span>На поле 4 монеты. Собрал — в рюкзак. Наступил на ловушку — весь прогресс уровня сгорает.</span></div>
-      <div><span class="i">🔥</span><span>Множитель за заход: 8 вскрытых клеток — ×2, 14 — ×3, 20 — ×4.</span></div>
+      <div><span class="i">👆</span><span>Поле 5×5: 20 безопасных клеток и 5 ловушек 💀. Цифра — сколько ловушек среди 8 соседей.</span></div>
+      <div><span class="i">🪙</span><span>Каждая безопасно вскрытая клетка = +1 монета в рюкзак. Ловушка — весь прогресс уровня сгорает.</span></div>
+      <div><span class="i">🔥</span><span>Множитель за заход: 1–10 клеток — ×1, 11–15 — ×2, 16–20 — ×3.</span></div>
       <div><span class="i">🚪</span><span>«Уйти» в любой момент — рюкзак × множитель уходит в прогресс уровня.</span></div>
-      <div><span class="i">🎯</span><span>Закрой квоту уровня за 3 захода. В забеге 9 уровней.</span></div>
+      <div><span class="i">🎯</span><span>Закрой квоту 30 за 3 захода. В забеге 9 уровней.</span></div>
     </div>
     <button class="btn btn-go" id="toLevels">Играть</button>
   </section>
@@ -40,7 +40,7 @@
       <div class="dives" id="dives">Заход 1/3</div>
     </div>
     <div class="quota">
-      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">6</span> 🪙</b></div>
+      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">30</span> 🪙</b></div>
       <div class="bar"><i id="qbar"></i></div>
     </div>
 

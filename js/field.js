@@ -26,14 +26,12 @@ function countTraps(cells, i){
   return neigh(i).filter(j => cells[j].trap).length;
 }
 
-// Сырое поле: COINS монет + `traps` ловушек, остальное пусто
+// Сырое поле: `traps` ловушек, остальное — безопасные клетки (каждая = +1 при вскрытии)
 function makeRaw(traps){
-  const cells = Array.from({length: SIZE * SIZE}, () => ({trap:false, coin:false, open:false}));
+  const cells = Array.from({length: SIZE * SIZE}, () => ({trap:false, open:false}));
   const idx = [...cells.keys()];
   shuffle(idx);
-  let p = 0;
-  for(let i = 0; i < traps; i++) cells[idx[p++]].trap = true;
-  for(let i = 0; i < COINS; i++) cells[idx[p++]].coin = true;
+  for(let i = 0; i < traps; i++) cells[idx[i]].trap = true;
   return cells;
 }
 
@@ -44,23 +42,11 @@ function safeNumbersOK(cells){
   return true;
 }
 
-// Желательная раскладка: минимум 2 монеты с нулевым риском (0 ловушек рядом)
-function coinSpreadOK(cells){
-  let lowRisk = 0;
-  cells.forEach((c, i) => { if(c.coin && countTraps(cells, i) === 0) lowRisk++; });
-  return lowRisk >= 2;
-}
-
-// Генерирует сбалансированное поле с `traps` ловушками;
+// Генерирует поле с `traps` ловушками, у которого цифры только 1..MAX_CLUE;
 // мягко деградирует, если идеал не найден
 function newField(traps){
   let last = makeRaw(traps);
   for(let a = 0; a < 600; a++){
-    const c = makeRaw(traps);
-    last = c;
-    if(safeNumbersOK(c) && coinSpreadOK(c)) return c;
-  }
-  for(let a = 0; a < 600; a++){          // ослабляем: только ограничение цифр ≤3
     const c = makeRaw(traps);
     last = c;
     if(safeNumbersOK(c)) return c;
@@ -78,7 +64,7 @@ function clearStart(i){
   if(!FIRST_TAP_BLANK) return;
   const zone = new Set([i, ...neigh(i)]);
   const free = [];
-  S.field.forEach((c, j) => { if(!zone.has(j) && !c.trap && !c.coin) free.push(j); });
+  S.field.forEach((c, j) => { if(!zone.has(j) && !c.trap) free.push(j); });
   shuffle(free);
   let f = 0;
   zone.forEach(j => {
@@ -91,5 +77,5 @@ function clearStart(i){
 
 // Текущий множитель жадности по числу безопасных вскрытий за заход
 function mult(){
-  return S.reveals >= TH4 ? 4 : S.reveals >= TH3 ? 3 : S.reveals >= TH2 ? 2 : 1;
+  return S.reveals >= TH3 ? 3 : S.reveals >= TH2 ? 2 : 1;
 }

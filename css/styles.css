@@ -37,7 +37,7 @@ body{
 .bar i{display:block;height:100%;background:var(--gem);width:0%;transition:width .35s ease;border-radius:4px}
 
 /* ---------- grid ---------- */
-.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
 .c{
   aspect-ratio:1;border-radius:9px;background:var(--cell);
   border:1px solid var(--line);

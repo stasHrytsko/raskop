@@ -3,7 +3,7 @@
 // ───────────────────────────────────────────────
 const grid = $('grid');
 
-// Вылетающая «+1 🪙» при подборе монеты
+// Вылетающая «+1 🪙» за каждую безопасно вскрытую клетку
 function flyCoin(i){
   const el = grid.children[i].getBoundingClientRect();
   const f = document.createElement('div');
@@ -27,9 +27,7 @@ function renderGrid(){
         d.textContent = '💀';
       } else {
         const n = trapCount(i);
-        if(c.coin){
-          d.innerHTML = `<div class="loot"><span class="ic">🪙</span><span class="v">${n || ''}</span></div>`;
-        } else if(n){
+        if(n){
           d.innerHTML = `<span class="num ${n >= 3 ? 'hot' : n === 2 ? 'warm' : ''}">${n}</span>`;
         } else {
           d.classList.add('n0');
@@ -56,12 +54,11 @@ function render(){
   $('total').textContent = S.pack * m;
   const me = $('mult');
   me.textContent = '×' + m;
-  me.className = 'mult' + (m === 4 ? ' x4' : m === 3 ? ' x3' : m === 2 ? ' x2' : '');
+  me.className = 'mult' + (m === 3 ? ' x3' : m === 2 ? ' x2' : '');
 
-  $('fuse').style.width = Math.min(100, S.reveals / TH4 * 100) + '%';
+  $('fuse').style.width = Math.min(100, S.reveals / TH3 * 100) + '%';
   $('fuseHint').innerHTML =
-      m === 4 ? '<b>Максимальная жадность ×4</b>'
-    : m === 3 ? `Ещё <b>${TH4 - S.reveals}</b> клеток до <b>×4</b>`
+      m === 3 ? '<b>Максимальная жадность ×3</b>'
     : m === 2 ? `Ещё <b>${TH3 - S.reveals}</b> клеток до <b>×3</b>`
     : `Ещё <b>${TH2 - S.reveals}</b> клеток до <b>×2</b>`;
 

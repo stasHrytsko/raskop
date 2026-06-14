@@ -53,13 +53,15 @@ function tap(i){
 
   if(cell.trap) return onTrap();
 
+  // Каждая безопасно вскрытая клетка = +1 в рюкзак
   S.reveals++;
-  if(cell.coin){ S.pack++; flyCoin(i); }
+  S.pack++;
+  flyCoin(i);
   renderGrid();
   render();
 
-  // Все монеты собраны — заход завершается автоматически (безопасно)
-  if(S.pack >= COINS) setTimeout(() => endDiveSafe(), 350);
+  // Все безопасные клетки вскрыты — заход завершается автоматически (безопасно)
+  if(S.reveals >= SIZE * SIZE - S.traps) setTimeout(() => endDiveSafe(), 350);
 }
 
 // Ловушка: весь прогресс уровня сгорает, поле раскрывается
