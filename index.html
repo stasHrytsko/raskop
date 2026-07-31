@@ -12,20 +12,20 @@
   <!-- ═══ СТРАНИЦА 1 — Название + правила ═══ -->
   <section id="screen-rules" class="screen screen-center">
     <div class="title">РАСКОП</div>
-    <div class="tagline">Вскрывай клетки за монетами — и реши, когда жадность пора остановить</div>
+    <div class="tagline">Исследуй гробницу комната за комнатой — и реши, когда пора остановиться</div>
     <div class="rules">
-      <div><span class="i">👆</span><span>Поле 5×5: 20 безопасных клеток и 5 ловушек 💀. Цифра — сколько ловушек среди 8 соседей.</span></div>
-      <div><span class="i">🪙</span><span>Каждая безопасно вскрытая клетка = +1 монета в рюкзак. Ловушка — весь прогресс уровня сгорает.</span></div>
-      <div><span class="i">🔥</span><span>Множитель за заход: 1–10 клеток — ×1, 11–15 — ×2, 16–20 — ×3.</span></div>
-      <div><span class="i">🚪</span><span>«Уйти» в любой момент — рюкзак × множитель уходит в прогресс уровня.</span></div>
-      <div><span class="i">🎯</span><span>Закрой квоту 60 за 3 захода. В забеге 9 уровней.</span></div>
+      <div><span class="i">👆</span><span>Уровень — гробница из нескольких комнат 5×5 подряд. Цифра на плитке — сколько ловушек 💀 среди 8 соседей.</span></div>
+      <div><span class="i">🪙</span><span>Каждая безопасная плитка сразу даёт +1 золото в квоту. Ловушка — весь прогресс уровня сгорает, гробница начинается заново.</span></div>
+      <div><span class="i">🚪</span><span>«Дальше →» — можно уйти в следующую комнату в любой момент, не обязательно вскрывать всё.</span></div>
+      <div><span class="i">🎯</span><span>Набрал квоту — открылось «К выходу →». Можно выйти сразу или рискнуть ещё одной комнатой.</span></div>
+      <div><span class="i">☠️</span><span>Перед входом видно, сколько ловушек в комнате — считай риски, а не гадай.</span></div>
     </div>
     <button class="btn btn-go" id="toLevels">Играть</button>
   </section>
 
-  <!-- ═══ СТРАНИЦА 2 — Карта забега ═══ -->
+  <!-- ═══ СТРАНИЦА 2 — Карта кампании ═══ -->
   <section id="screen-levels" class="screen">
-    <h1 class="screen-h">Забег</h1>
+    <h1 class="screen-h">Кампания</h1>
     <div class="record" id="record"></div>
     <div class="legend"><span class="lg easy">Легко</span><span class="lg med">Средне</span><span class="lg hard">Сложно</span></div>
     <div class="levels" id="levels"></div>
@@ -37,37 +37,35 @@
   <section id="screen-game" class="screen">
     <div class="top">
       <button class="btn-back" id="toLevels2">← УР. <b id="lvl">1</b></button>
-      <div class="dives" id="dives">Заход 1/3</div>
+      <div class="dives" id="roomInfo">Комната 1/2</div>
     </div>
+    <div class="roomtraps" id="roomTraps"></div>
     <div class="quota">
-      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">60</span> 🪙</b></div>
+      <div class="quota-label"><span>Цель уровня</span><b><span id="prog">0</span> / <span id="quota">0</span> 🪙</b></div>
       <div class="bar"><i id="qbar"></i></div>
     </div>
 
     <div class="grid" id="grid"></div>
 
-    <div class="pack">
-      <div class="pack-row">
-        <div class="sum">🎒 <span id="pack">0</span> <small>× <span id="multTxt">1</span> = <span id="total">0</span></small></div>
-        <div class="mult" id="mult">×1</div>
-      </div>
-      <div class="fuse"><i id="fuse"></i><span class="tick" style="left:66.6%"></span><span class="tick" style="left:100%"></span></div>
-      <div class="fuse-hint" id="fuseHint"></div>
-    </div>
-
-    <button class="btn btn-leave" id="leaveBtn">Рюкзак пуст</button>
+    <button class="btn btn-leave" id="actionBtn">Дальше →</button>
+    <button class="btn btn-ghost" id="secondaryBtn" style="display:none">Ещё одна комната →</button>
   </section>
 
 </div>
 
 <div id="ovl"></div>
 
-<!-- Порядок важен: config → field → ui → render → nav → game -->
+<!-- Порядок важен: config → gen/rules → gen/room → core/tomb → core/economy →
+     core/run → ui/popups → ui/room-render → ui/nav → app -->
 <script src="js/config.js"></script>
-<script src="js/field.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/render.js"></script>
-<script src="js/nav.js"></script>
-<script src="js/game.js"></script>
+<script src="js/gen/rules.js"></script>
+<script src="js/gen/room.js"></script>
+<script src="js/core/tomb.js"></script>
+<script src="js/core/economy.js"></script>
+<script src="js/core/run.js"></script>
+<script src="js/ui/popups.js"></script>
+<script src="js/ui/room-render.js"></script>
+<script src="js/ui/nav.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
