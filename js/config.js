@@ -45,5 +45,10 @@ const quotaFor = n => Math.round(QUOTA_RATIO * roomsFor(n) * safeCellsPerRoom);
 // сокровищнице — вне скоупа Фазы 2).
 const VAULT_SIZE = 3;             // размер бонусной комнаты (VAULT_SIZE × VAULT_SIZE, 0 ловушек)
 
+// ─── Фаза 3 (Эпик G/H): кошелёк + постоянные артефакты ───
+const WALLET_KEY = 'raskop_wallet';    // ключ кошелька в localStorage (отдельно от прогресса)
+const REPLAY_GOLD_RATIO = 0.2;         // доля золота при повторном прохождении уровня
+const SEAL_GOLD_LOSS_RATIO = 0.5;      // доля золота, теряемая при срабатывании Печати хранителя
+
 // Маленький DOM-хелпер, общий для всех модулей
 const $ = id => document.getElementById(id);

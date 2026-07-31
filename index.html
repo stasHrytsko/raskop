@@ -27,6 +27,7 @@
   <section id="screen-levels" class="screen">
     <h1 class="screen-h">Кампания</h1>
     <div class="record" id="record"></div>
+    <div class="wallet" id="walletLine"></div>
     <div class="legend"><span class="lg easy">Легко</span><span class="lg med">Средне</span><span class="lg hard">Сложно</span></div>
     <div class="levels" id="levels"></div>
     <div id="mapActions"></div>
@@ -46,6 +47,7 @@
     </div>
 
     <button class="vault locked" id="vaultBanner" style="display:none"></button>
+    <button class="artifact-bar" id="artifactBar" style="display:none"></button>
 
     <div class="grid" id="grid"></div>
 
@@ -58,16 +60,21 @@
 <div id="ovl"></div>
 
 <!-- Порядок важен: config → gen/rules → gen/room → core/tomb → core/economy →
-     core/keys → core/run → ui/popups → ui/room-render → ui/nav → app -->
+     core/keys → core/wallet → content/artifacts-permanent → core/artifacts-permanent →
+     core/run → ui/popups → ui/room-render → ui/artifact-ui → ui/nav → app -->
 <script src="js/config.js"></script>
 <script src="js/gen/rules.js"></script>
 <script src="js/gen/room.js"></script>
 <script src="js/core/tomb.js"></script>
 <script src="js/core/economy.js"></script>
 <script src="js/core/keys.js"></script>
+<script src="js/core/wallet.js"></script>
+<script src="js/content/artifacts-permanent.js"></script>
+<script src="js/core/artifacts-permanent.js"></script>
 <script src="js/core/run.js"></script>
 <script src="js/ui/popups.js"></script>
 <script src="js/ui/room-render.js"></script>
+<script src="js/ui/artifact-ui.js"></script>
 <script src="js/ui/nav.js"></script>
 <script src="js/app.js"></script>
 </body>

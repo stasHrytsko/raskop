@@ -3,4 +3,5 @@
 //  Заменяет: js/game.js (хвост: loadBest(); initNav();)
 // ───────────────────────────────────────────────
 loadProgress();
+loadWallet();
 initNav();

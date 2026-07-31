@@ -1,10 +1,11 @@
 // ───────────────────────────────────────────────
 //  Попытка уровня — тап по клетке, переход между комнатами, победа/провал
-//  Эпик: O (базовый цикл; кошелёк/перенос золота в метавалюту — Эпик G, Фаза 3)
+//  Эпик: O (базовый цикл) · G/H (Фаза 3) — начисление в кошелёк при победе, активация
+//  постоянного артефакта перехватывает tap()/onTrap()
 //  Эпик: E (Фаза 2) — ключ спрятан под случайной клеткой; тап маршрутизируется в
 //  бонусную комнату, пока R.inBonus
 //  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js,
-//  core/keys.js
+//  core/keys.js, core/wallet.js, core/artifacts-permanent.js
 //  Заменяет: startLevel/nextDive/tap/onTrap/endDive/clearLevel/runOver из старого game.js
 // ───────────────────────────────────────────────
 let progress = { current: 0, cleared: 0 };  // прогресс кампании (localStorage)
@@ -30,13 +31,16 @@ function startLevel(n){
   saveProgress();
   R = { level: n, quota: quotaFor(n), gold: 0, tomb: newTomb(n), live: true };
   initKeyState(R);
+  initArtifactState(R);
   renderRoom();
 }
 
-// ─── тап по закрытой клетке: основная комната, либо бонусная (R.inBonus) ───
+// ─── тап по закрытой клетке: основная комната, либо бонусная (R.inBonus),
+//      либо прицеливание Глаза скарабея (R.artifactArmed) ───
 function tap(i){
   if(!R.live) return;
   if(R.inBonus) return tapBonus(i);
+  if(R.artifactArmed === 'scarab') return tapScarab(i);
 
   const rm = curRoom();
   const cell = rm.cells[i];
@@ -46,7 +50,7 @@ function tap(i){
   if(!rm.firstTapDone){ clearStart(rm.cells, i, rm.size); rm.firstTapDone = true; }
   cell.open = true;
 
-  if(cell.type === 'trap') return onTrap();
+  if(cell.type === 'trap') return onTrap(i);
 
   rm.openedSafe++;
   if(cell.type === 'key'){
@@ -71,6 +75,15 @@ function tapBonus(i){
   rm.openedSafe++;
   addGold(R, 1);
   flyText(i, '+1 🪙');
+  renderRoom();
+}
+
+// ─── тап-цель Глаза скарабея: проверка без вскрытия, клетка остаётся закрытой ───
+function tapScarab(i){
+  const rm = curRoom();
+  if(rm.cells[i].open) return;
+  const isTrap = checkScarab(R, i);
+  flyText(i, isTrap ? '💀 Ловушка!' : '✅ Безопасно');
   renderRoom();
 }
 
@@ -113,8 +126,14 @@ function goLeaveVault(){
   renderRoom();
 }
 
-// ─── ловушка: провал уровня, комната вскрывается полностью для показа ───
-function onTrap(){
+// ─── ловушка: Печать хранителя может нейтрализовать (уровень продолжается), иначе —
+//      провал уровня, комната вскрывается полностью для показа ───
+function onTrap(i){
+  if(tryGuardianSeal(R)){
+    curRoom().cells[i].neutralized = true;
+    renderRoom();
+    return;
+  }
   R.live = false;
   curRoom().cells.forEach(c => c.open = true);
   navigator.vibrate && navigator.vibrate([60, 40, 120]);
@@ -134,7 +153,16 @@ function win(){
   R.live = false;
   progress.cleared = Math.max(progress.cleared, R.level + 1);
   saveProgress();
+  const award = awardLevelGold(R.level, R.gold);
   renderRoom();
-  if(R.level >= LEVELS_COUNT - 1) return showCampaignWin();
-  showLevelWin(R.level);
+
+  if(R.level >= LEVELS_COUNT - 1) return showCampaignWin(award);
+
+  // После уровня 3 — разовый выбор бесплатного постоянного артефакта (Эпик H)
+  const level = R.level;
+  const needsPick = level === 2 && !wallet.artifact;
+  const proceed = () => needsPick
+    ? showArtifactPick(() => startLevel(level + 1))
+    : startLevel(level + 1);
+  showLevelWin(level, award, proceed);
 }

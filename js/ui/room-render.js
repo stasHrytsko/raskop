@@ -2,8 +2,9 @@
 //  Отрисовка текущей комнаты — сетка клеток + HUD + кнопки действий
 //  Эпик: C, D (tasks.md) · Фаза 1
 //  Эпик: E (Фаза 2) — бонусная комната, баннер двери
+//  Эпик: H (Фаза 3) — нейтрализованная ловушка (Печать хранителя), кнопка артефакта
 //  Зависит от: config.js, gen/room.js (clueAt), core/tomb.js, core/economy.js,
-//  core/run.js, core/keys.js
+//  core/run.js, core/keys.js, core/artifacts-permanent.js
 //  Заменяет: render.js (renderGrid/render/flyCoin)
 // ───────────────────────────────────────────────
 const grid = $('grid');
@@ -33,8 +34,13 @@ function renderCells(){
     d.className = 'c' + (c.open ? ' open' : '');
     if(c.open){
       if(c.type === 'trap'){
-        d.classList.add('trap');
-        d.textContent = '💀';
+        if(c.neutralized){
+          d.classList.add('neutral');
+          d.textContent = '🛡️';
+        } else {
+          d.classList.add('trap');
+          d.textContent = '💀';
+        }
       } else {
         const n = clueAt(rm, i);
         if(n){
@@ -136,6 +142,7 @@ function renderRoom(){
   $('qbar').style.width = Math.min(100, R.gold / R.quota * 100) + '%';
 
   renderVaultBanner();
+  renderArtifactBar();
   renderCells();
   updateActionButton();
 }

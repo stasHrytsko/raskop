@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────
 //  Роутинг между экранами (правила / карта кампании / игра)
-//  Фаза 1 · Зависит от: config.js, core/run.js
+//  Фаза 1 · Фаза 3 — строка кошелька на карте кампании
+//  Зависит от: config.js, core/run.js, core/wallet.js, content/artifacts-permanent.js
 //  Заменяет: js/nav.js (showScreen/buildMap/gotoMap/initNav)
 // ───────────────────────────────────────────────
 
@@ -16,6 +17,9 @@ function buildMap(){
   $('record').textContent = progress.cleared > 0
     ? `Пройдено уровней: ${progress.cleared} / ${LEVELS_COUNT}`
     : 'Прогресс: пока нет';
+  const artifactDef = wallet.artifact && ARTIFACTS_PERMANENT.find(a => a.id === wallet.artifact);
+  $('walletLine').textContent = `Кошелёк: ${wallet.gold} 🪙`
+    + (artifactDef ? ` · ${artifactDef.icon} ${artifactDef.name}` : '');
 
   const wrap = $('levels');
   wrap.innerHTML = '';

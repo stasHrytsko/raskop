@@ -52,6 +52,14 @@ body{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 rgba(0,0,0,.35);
 }
 .vault.open:disabled{opacity:.5;cursor:default}
+
+/* ---------- постоянный артефакт (Эпик H) ---------- */
+.artifact-bar{
+  width:100%;border:1px solid #1f5f52;border-radius:12px;padding:11px 14px;
+  margin-bottom:12px;font-size:13.5px;font-weight:700;font-family:inherit;text-align:center;
+  background:linear-gradient(180deg,#2a3f3a,#16221e);color:var(--gem);cursor:pointer;
+}
+.artifact-bar:disabled{opacity:.55;cursor:default;color:var(--sand-dim)}
 .quota-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sand-dim);margin-bottom:5px}
 .quota-label b{color:var(--sand);font-variant-numeric:tabular-nums}
 .bar{height:8px;background:#15100d;border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
@@ -102,6 +110,11 @@ body{
   animation:shake .4s ease;
 }
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.c.neutral{
+  background:radial-gradient(circle at 50% 40%,#1c3a35,#12211e 70%);
+  border-color:var(--gem);
+  box-shadow:0 0 14px rgba(62,198,168,.4), inset 0 2px 5px rgba(0,0,0,.5);
+}
 .fly{position:fixed;font-weight:800;color:var(--gem);font-size:15px;pointer-events:none;z-index:60;animation:fly .7s ease forwards}
 @keyframes fly{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-34px)}}
 
@@ -166,6 +179,14 @@ body{
 .card p b{color:var(--sand)}
 .card .big{font-size:34px;font-weight:800;font-family:ui-monospace,Menlo,monospace;margin:8px 0 14px}
 .card .ok{color:var(--gem)} .card .bad{color:var(--danger)} .card .amb{color:var(--amber)}
+.artifact-pick{
+  display:block;width:100%;text-align:left;margin-top:10px;padding:12px 14px;
+  border:1px solid var(--line);border-radius:12px;font-family:inherit;cursor:pointer;
+  background:linear-gradient(155deg,rgba(255,255,255,.04),transparent);color:var(--sand);
+}
+.artifact-pick b{font-size:14.5px}
+.artifact-pick small{color:var(--sand-dim);font-weight:400}
+.artifact-pick:active{transform:scale(.98)}
 .rules{text-align:left;font-size:14px;line-height:1.55;color:var(--sand-dim);margin:14px 0 18px}
 .rules div{margin-bottom:9px;display:flex;gap:9px}
 .rules .i{flex:0 0 22px;text-align:center}
@@ -188,7 +209,8 @@ body{
   font-family:var(--font-title);font-size:24px;font-weight:700;text-align:center;margin:6px 0 4px;
   color:var(--amber);text-shadow:0 1px 0 rgba(0,0,0,.5);
 }
-.record{text-align:center;font-size:13px;color:var(--sand-dim);margin-bottom:14px}
+.record{text-align:center;font-size:13px;color:var(--sand-dim);margin-bottom:2px}
+.wallet{text-align:center;font-size:13px;color:var(--amber);font-weight:700;margin-bottom:14px}
 #mapActions{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 
 /* ---------- легенда сложности ---------- */
