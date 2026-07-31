@@ -1,7 +1,8 @@
 // ───────────────────────────────────────────────
 //  Попытка уровня — тап по клетке, переход между комнатами, победа/провал
 //  Эпик: O (базовый цикл; кошелёк/перенос золота в метавалюту — Эпик G, Фаза 3)
-//  Эпик: E/F (Фаза 2) — тап маршрутизируется в бонусную комнату, пока R.inBonus
+//  Эпик: E (Фаза 2) — ключ спрятан под случайной клеткой; тап маршрутизируется в
+//  бонусную комнату, пока R.inBonus
 //  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js,
 //  core/keys.js
 //  Заменяет: startLevel/nextDive/tap/onTrap/endDive/clearLevel/runOver из старого game.js
@@ -48,16 +49,20 @@ function tap(i){
   if(cell.type === 'trap') return onTrap();
 
   rm.openedSafe++;
-  addGold(R, 1);
-  noteSafeOpen(R);
-  flyCoin(i);
+  if(cell.type === 'key'){
+    R.hasKey = true;
+    flyText(i, '🗝️ Ключ!');
+  } else {
+    addGold(R, 1);
+    flyText(i, '+1 🪙');
+  }
   renderRoom();
 
   // Все безопасные клетки комнаты открыты — комната исчерпана
   if(rm.openedSafe >= rm.size * rm.size - rm.traps) setTimeout(onRoomCleared, 300);
 }
 
-// ─── тап в бонусной комнате (сокровищница): без ловушек, без честного старта ───
+// ─── тап в бонусной комнате (сокровищница): без ловушек, без честного старта, без ключей ───
 function tapBonus(i){
   const rm = R.bonusRoom;
   const cell = rm.cells[i];
@@ -65,7 +70,7 @@ function tapBonus(i){
   cell.open = true;
   rm.openedSafe++;
   addGold(R, 1);
-  flyCoin(i);
+  flyText(i, '+1 🪙');
   renderRoom();
 }
 

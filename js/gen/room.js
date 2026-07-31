@@ -30,3 +30,13 @@ function newRoom(size, traps){
 function clueAt(room, i){
   return countTraps(room.cells, i, room.size);
 }
+
+// Спрятать ключ под случайной безопасной клеткой комнаты (Эпик E). Игрок заранее не
+// знает, есть ли в комнате ключ (concept.txt, «Что известно игроку») — клетка визуально
+// не отличается от золота до вскрытия, и после вскрытия по-прежнему показывает только
+// цифру подсказки, как золото.
+function placeKey(room){
+  const safeIdx = room.cells.map((c, i) => i).filter(i => room.cells[i].type !== 'trap');
+  const i = safeIdx[Math.random() * safeIdx.length | 0];
+  room.cells[i].type = 'key';
+}

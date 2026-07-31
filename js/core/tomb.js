@@ -15,5 +15,6 @@ function newTomb(n){
   const count = roomsFor(n);
   const rooms = Array.from({ length: count }, () => newRoom(ROOM_SIZE, TRAPS_PER_ROOM));
   const keyRoomIndex = Math.floor(Math.random() * (count - 1)); // 0..count-2
+  placeKey(rooms[keyRoomIndex]);
   return { rooms, currentRoomIndex: 0, keyRoomIndex, vaultRoomIndex: count - 1 };
 }

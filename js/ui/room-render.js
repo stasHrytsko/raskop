@@ -1,7 +1,7 @@
 // ───────────────────────────────────────────────
 //  Отрисовка текущей комнаты — сетка клеток + HUD + кнопки действий
 //  Эпик: C, D (tasks.md) · Фаза 1
-//  Эпик: E, F (Фаза 2) — бонусная комната, баннер двери, строка видимой награды
+//  Эпик: E (Фаза 2) — бонусная комната, баннер двери
 //  Зависит от: config.js, gen/room.js (clueAt), core/tomb.js, core/economy.js,
 //  core/run.js, core/keys.js
 //  Заменяет: render.js (renderGrid/render/flyCoin)
@@ -11,20 +11,12 @@ const grid = $('grid');
 // Активная комната: бонусная (сокровищница), пока в ней, иначе текущая основная
 function activeRoom(){ return R.inBonus ? R.bonusRoom : curRoom(); }
 
-// Русское склонение существительного по числу (1 плитку / 2 плитки / 5 плиток)
-function pluralRu(n, one, few, many){
-  const mod10 = n % 10, mod100 = n % 100;
-  if(mod10 === 1 && mod100 !== 11) return one;
-  if(mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
-  return many;
-}
-
-// Вылетающая «+1 🪙» за каждую безопасно вскрытую клетку
-function flyCoin(i){
+// Вылетающий текст над клеткой при её безопасном вскрытии («+1 🪙» / «🗝️ Ключ!»)
+function flyText(i, text){
   const el = grid.children[i].getBoundingClientRect();
   const f = document.createElement('div');
   f.className = 'fly';
-  f.textContent = '+1 🪙';
+  f.textContent = text;
   f.style.left = (el.left + el.width / 2 - 18) + 'px';
   f.style.top = (el.top - 4) + 'px';
   document.body.appendChild(f);
@@ -102,20 +94,6 @@ function updateActionButton(){
   }
 }
 
-// Строка видимой близкой награды (Эпик F) — только в keyRoomIndex, пока ключ не найден
-function renderObjective(){
-  const el = $('objective');
-  const inKeyRoom = !R.inBonus && R.tomb.currentRoomIndex === R.tomb.keyRoomIndex;
-  if(inKeyRoom && !R.objective.done){
-    const left = R.objective.target - R.objective.current;
-    const noun = pluralRu(left, 'плитку', 'плитки', 'плиток');
-    el.textContent = `🗝️ Ещё ${left} ${noun} — и найдёшь ключ`;
-    el.style.display = '';
-  } else {
-    el.style.display = 'none';
-  }
-}
-
 // Баннер двери сокровищницы — только в vaultRoomIndex, пока не открыта
 function renderVaultBanner(){
   const el = $('vaultBanner');
@@ -157,7 +135,6 @@ function renderRoom(){
   $('prog').textContent = R.gold;
   $('qbar').style.width = Math.min(100, R.gold / R.quota * 100) + '%';
 
-  renderObjective();
   renderVaultBanner();
   renderCells();
   updateActionButton();
