@@ -1,10 +1,23 @@
 // ───────────────────────────────────────────────
 //  Отрисовка текущей комнаты — сетка клеток + HUD + кнопки действий
 //  Эпик: C, D (tasks.md) · Фаза 1
-//  Зависит от: config.js, gen/room.js (clueAt), core/tomb.js, core/economy.js, core/run.js
+//  Эпик: E, F (Фаза 2) — бонусная комната, баннер двери, строка видимой награды
+//  Зависит от: config.js, gen/room.js (clueAt), core/tomb.js, core/economy.js,
+//  core/run.js, core/keys.js
 //  Заменяет: render.js (renderGrid/render/flyCoin)
 // ───────────────────────────────────────────────
 const grid = $('grid');
+
+// Активная комната: бонусная (сокровищница), пока в ней, иначе текущая основная
+function activeRoom(){ return R.inBonus ? R.bonusRoom : curRoom(); }
+
+// Русское склонение существительного по числу (1 плитку / 2 плитки / 5 плиток)
+function pluralRu(n, one, few, many){
+  const mod10 = n % 10, mod100 = n % 100;
+  if(mod10 === 1 && mod100 !== 11) return one;
+  if(mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
 
 // Вылетающая «+1 🪙» за каждую безопасно вскрытую клетку
 function flyCoin(i){
@@ -18,9 +31,9 @@ function flyCoin(i){
   setTimeout(() => f.remove(), 700);
 }
 
-// Перерисовка сетки текущей комнаты
+// Перерисовка сетки активной комнаты
 function renderCells(){
-  const rm = curRoom();
+  const rm = activeRoom();
   grid.innerHTML = '';
   grid.style.gridTemplateColumns = `repeat(${rm.size}, 1fr)`;
   rm.cells.forEach((c, i) => {
@@ -45,14 +58,22 @@ function renderCells(){
   });
 }
 
-// Кнопки действий: «Дальше →» / «К выходу →» (+ опциональная «Ещё одна комната →»)
+// Кнопки действий: «Дальше →» / «К выходу →» / «Продолжить →» (из сокровищницы)
 function updateActionButton(){
   const primary = $('actionBtn');
   const secondary = $('secondaryBtn');
+  secondary.style.display = 'none';
+
+  if(R.inBonus){
+    primary.className = 'btn btn-go';
+    primary.textContent = 'Продолжить →';
+    primary.disabled = !R.live;
+    primary.onclick = goLeaveVault;
+    return;
+  }
+
   const last = isLastRoom();
   const met = quotaMet(R);
-
-  secondary.style.display = 'none';
 
   if(last && met){
     primary.className = 'btn btn-go';
@@ -81,16 +102,63 @@ function updateActionButton(){
   }
 }
 
-// Перерисовка HUD и сетки текущей комнаты
+// Строка видимой близкой награды (Эпик F) — только в keyRoomIndex, пока ключ не найден
+function renderObjective(){
+  const el = $('objective');
+  const inKeyRoom = !R.inBonus && R.tomb.currentRoomIndex === R.tomb.keyRoomIndex;
+  if(inKeyRoom && !R.objective.done){
+    const left = R.objective.target - R.objective.current;
+    const noun = pluralRu(left, 'плитку', 'плитки', 'плиток');
+    el.textContent = `🗝️ Ещё ${left} ${noun} — и найдёшь ключ`;
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// Баннер двери сокровищницы — только в vaultRoomIndex, пока не открыта
+function renderVaultBanner(){
+  const el = $('vaultBanner');
+  const inVaultRoom = !R.inBonus && R.tomb.currentRoomIndex === R.tomb.vaultRoomIndex;
+  if(!inVaultRoom || R.vaultOpened){
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = '';
+  if(R.hasKey){
+    el.className = 'vault open';
+    el.textContent = '🔓 Открыть дверь в сокровищницу →';
+    el.disabled = !R.live;
+    el.onclick = goOpenVault;
+  } else {
+    el.className = 'vault locked';
+    el.textContent = '🔒 Заперта дверь в сокровищницу';
+    el.disabled = true;
+    el.onclick = null;
+  }
+}
+
+// Перерисовка HUD и сетки активной комнаты
 function renderRoom(){
-  const rm = curRoom();
+  const rm = activeRoom();
   $('lvl').textContent = R.level + 1;
-  $('roomInfo').textContent = `Комната ${R.tomb.currentRoomIndex + 1}/${R.tomb.rooms.length}`;
-  $('roomTraps').textContent = `В этой комнате ${rm.traps} ловушек`;
+  $('roomInfo').textContent = R.inBonus
+    ? 'Сокровищница'
+    : `Комната ${R.tomb.currentRoomIndex + 1}/${R.tomb.rooms.length}`;
+
+  if(R.inBonus){
+    $('roomTraps').textContent = 'Ловушек нет — чистый бонус';
+  } else {
+    const keyBadge = R.hasKey && !R.vaultOpened ? ' · 🗝️' : '';
+    $('roomTraps').textContent = `В этой комнате ${rm.traps} ловушек${keyBadge}`;
+  }
+
   $('quota').textContent = R.quota;
   $('prog').textContent = R.gold;
   $('qbar').style.width = Math.min(100, R.gold / R.quota * 100) + '%';
 
+  renderObjective();
+  renderVaultBanner();
   renderCells();
   updateActionButton();
 }

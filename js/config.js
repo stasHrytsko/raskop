@@ -38,5 +38,12 @@ const roomsFor = n => ROOMS_PER_TIER[tierFor(n)];
 const safeCellsPerRoom = ROOM_SIZE * ROOM_SIZE - TRAPS_PER_ROOM;
 const quotaFor = n => Math.round(QUOTA_RATIO * roomsFor(n) * safeCellsPerRoom);
 
+// ─── Фаза 2 (Эпик E/F): ключ + закрытая комната-«карман» ───
+// Ключ находится в случайной комнате до последней — счётчик «ещё N плиток» (видимая
+// близкая награда, Эпик F). Комната-сокровищница всегда последняя в гробнице, без
+// ловушек (чистый бонус, риск в сокровищнице — вне скоупа Фазы 2).
+const KEY_OBJECTIVE_TARGET = 3;   // сколько безопасных клеток открыть в key-room ради ключа
+const VAULT_SIZE = 3;             // размер бонусной комнаты (VAULT_SIZE × VAULT_SIZE, 0 ловушек)
+
 // Маленький DOM-хелпер, общий для всех модулей
 const $ = id => document.getElementById(id);

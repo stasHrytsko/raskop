@@ -39,6 +39,20 @@ body{
 .roomtraps{font-size:12.5px;color:var(--sand-dim);margin-bottom:10px}
 
 .quota{margin-bottom:12px}
+
+/* ---------- видимая награда (Эпик F) + дверь сокровищницы (Эпик E) ---------- */
+.objective{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:10px}
+.vault{
+  width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 14px;
+  margin-bottom:12px;font-size:13.5px;font-weight:700;font-family:inherit;text-align:center;
+}
+.vault.locked{background:var(--earth-2);color:var(--sand-dim);cursor:default}
+.vault.open{
+  background:linear-gradient(180deg,var(--gold-hi),var(--amber) 55%,var(--gold-lo));
+  color:#2a1500;border-color:#6b4315;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 rgba(0,0,0,.35);
+}
+.vault.open:disabled{opacity:.5;cursor:default}
 .quota-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sand-dim);margin-bottom:5px}
 .quota-label b{color:var(--sand);font-variant-numeric:tabular-nums}
 .bar{height:8px;background:#15100d;border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}

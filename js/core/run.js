@@ -1,7 +1,9 @@
 // ───────────────────────────────────────────────
 //  Попытка уровня — тап по клетке, переход между комнатами, победа/провал
 //  Эпик: O (базовый цикл; кошелёк/перенос золота в метавалюту — Эпик G, Фаза 3)
-//  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js
+//  Эпик: E/F (Фаза 2) — тап маршрутизируется в бонусную комнату, пока R.inBonus
+//  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js,
+//  core/keys.js
 //  Заменяет: startLevel/nextDive/tap/onTrap/endDive/clearLevel/runOver из старого game.js
 // ───────────────────────────────────────────────
 let progress = { current: 0, cleared: 0 };  // прогресс кампании (localStorage)
@@ -26,12 +28,15 @@ function startLevel(n){
   progress.current = n;
   saveProgress();
   R = { level: n, quota: quotaFor(n), gold: 0, tomb: newTomb(n), live: true };
+  initKeyState(R);
   renderRoom();
 }
 
-// ─── тап по закрытой клетке текущей комнаты ───
+// ─── тап по закрытой клетке: основная комната, либо бонусная (R.inBonus) ───
 function tap(i){
   if(!R.live) return;
+  if(R.inBonus) return tapBonus(i);
+
   const rm = curRoom();
   const cell = rm.cells[i];
   if(cell.open) return;
@@ -44,11 +49,24 @@ function tap(i){
 
   rm.openedSafe++;
   addGold(R, 1);
+  noteSafeOpen(R);
   flyCoin(i);
   renderRoom();
 
   // Все безопасные клетки комнаты открыты — комната исчерпана
   if(rm.openedSafe >= rm.size * rm.size - rm.traps) setTimeout(onRoomCleared, 300);
+}
+
+// ─── тап в бонусной комнате (сокровищница): без ловушек, без честного старта ───
+function tapBonus(i){
+  const rm = R.bonusRoom;
+  const cell = rm.cells[i];
+  if(cell.open) return;
+  cell.open = true;
+  rm.openedSafe++;
+  addGold(R, 1);
+  flyCoin(i);
+  renderRoom();
 }
 
 // ─── комната исчерпана: авто-переход дальше, либо провал в последней без квоты ───
@@ -61,7 +79,7 @@ function onRoomCleared(){
 
 // ─── «Дальше →»: доступна в любой не последней комнате в любой момент, даже без тапов ───
 function goNext(){
-  if(!R.live || isLastRoom()) return;
+  if(!R.live || R.inBonus || isLastRoom()) return;
   advanceRoom();
 }
 
@@ -73,8 +91,21 @@ function advanceRoom(){
 
 // ─── «К выходу →»: доступна из любой комнаты, как только квота набрана ───
 function goExit(){
-  if(!R.live || !quotaMet(R)) return;
+  if(!R.live || R.inBonus || !quotaMet(R)) return;
   win();
+}
+
+// ─── «Открыть дверь в сокровищницу →» / «Продолжить →» из бонусной комнаты ───
+function goOpenVault(){
+  if(!R.live || R.inBonus) return;
+  openVault(R);
+  renderRoom();
+}
+
+function goLeaveVault(){
+  if(!R.live || !R.inBonus) return;
+  leaveVault(R);
+  renderRoom();
 }
 
 // ─── ловушка: провал уровня, комната вскрывается полностью для показа ───
