@@ -60,6 +60,13 @@ body{
   background:linear-gradient(180deg,#2a3f3a,#16221e);color:var(--gem);cursor:pointer;
 }
 .artifact-bar:disabled{opacity:.55;cursor:default;color:var(--sand-dim)}
+
+/* ---------- временный артефакт (Эпик I) ---------- */
+.artifact-bar.temp{
+  border-color:#4A3B6E;
+  background:linear-gradient(180deg,#332950,#1C1730);color:#B79CF2;
+}
+.artifact-bar.temp:disabled{opacity:.7;cursor:default;color:#8f7fb0}
 .quota-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sand-dim);margin-bottom:5px}
 .quota-label b{color:var(--sand);font-variant-numeric:tabular-nums}
 .bar{height:8px;background:#15100d;border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
@@ -110,6 +117,9 @@ body{
   animation:shake .4s ease;
 }
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.c.revealed{
+  box-shadow:inset 0 0 0 2px var(--gem), 0 0 10px rgba(62,198,168,.4), inset 0 -3px 4px rgba(0,0,0,.45);
+}
 .c.neutral{
   background:radial-gradient(circle at 50% 40%,#1c3a35,#12211e 70%);
   border-color:var(--gem);

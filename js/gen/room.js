@@ -2,7 +2,8 @@
 //  Генератор одной комнаты — клетки, числовые подсказки
 //  Эпик: C (tasks.md) · Фаза 1: newRoom() создаёт только 'gold'/'trap'
 //  Эпик: E (Фаза 2) · placeKey() дозаписывает одну клетку как 'key' поверх готовой комнаты
-//  (empty/hint/artifact — Эпики C-остаток/H/I/J, будущие фазы — генератор их не создаёт)
+//  Эпик: I (Фаза 4) · placeArtifact() — аналогично, клетка типа 'artifact'
+//  (empty/hint — Эпики C-остаток/J, будущие фазы — генератор их пока не создаёт)
 //  Зависит от: config.js, gen/rules.js
 // ───────────────────────────────────────────────
 
@@ -37,7 +38,19 @@ function clueAt(room, i){
 // не отличается от золота до вскрытия, и после вскрытия по-прежнему показывает только
 // цифру подсказки, как золото.
 function placeKey(room){
-  const safeIdx = room.cells.map((c, i) => i).filter(i => room.cells[i].type !== 'trap');
+  const safeIdx = room.cells.map((c, i) => i).filter(i => room.cells[i].type === 'gold');
   const i = safeIdx[Math.random() * safeIdx.length | 0];
   room.cells[i].type = 'key';
+}
+
+// Спрятать временный артефакт под случайной безопасной клеткой (Эпик I, Фаза 4) — как
+// ключ, сюрприз при обычном тапе, клетка визуально не отличается от золота/ключа до
+// вскрытия. Фильтр по 'gold' (не «!== trap»), чтобы не перезаписать уже занятую клетку
+// с ключом, если placeKey и placeArtifact выбрали одну и ту же комнату.
+function placeArtifact(room, id){
+  const safeIdx = room.cells.map((c, i) => i).filter(i => room.cells[i].type === 'gold');
+  if(!safeIdx.length) return;
+  const i = safeIdx[Math.random() * safeIdx.length | 0];
+  room.cells[i].type = 'artifact';
+  room.cells[i].artifactId = id;
 }

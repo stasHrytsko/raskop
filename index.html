@@ -48,6 +48,7 @@
 
     <button class="vault locked" id="vaultBanner" style="display:none"></button>
     <button class="artifact-bar" id="artifactBar" style="display:none"></button>
+    <button class="artifact-bar temp" id="tempArtifactBar" style="display:none"></button>
 
     <div class="grid" id="grid"></div>
 
@@ -60,8 +61,9 @@
 <div id="ovl"></div>
 
 <!-- Порядок важен: config → gen/rules → gen/room → core/tomb → core/economy →
-     core/keys → core/wallet → content/artifacts-permanent → core/artifacts-permanent →
-     core/run → ui/popups → ui/room-render → ui/artifact-ui → ui/nav → app -->
+     core/keys → core/wallet → content/artifacts-permanent → content/artifacts-temp →
+     core/artifacts-permanent → core/artifacts-temp → core/run → ui/popups →
+     ui/room-render → ui/artifact-ui → ui/nav → app -->
 <script src="js/config.js"></script>
 <script src="js/gen/rules.js"></script>
 <script src="js/gen/room.js"></script>
@@ -70,7 +72,9 @@
 <script src="js/core/keys.js"></script>
 <script src="js/core/wallet.js"></script>
 <script src="js/content/artifacts-permanent.js"></script>
+<script src="js/content/artifacts-temp.js"></script>
 <script src="js/core/artifacts-permanent.js"></script>
+<script src="js/core/artifacts-temp.js"></script>
 <script src="js/core/run.js"></script>
 <script src="js/ui/popups.js"></script>
 <script src="js/ui/room-render.js"></script>

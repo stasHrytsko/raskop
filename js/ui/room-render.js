@@ -3,8 +3,9 @@
 //  Эпик: C, D (tasks.md) · Фаза 1
 //  Эпик: E (Фаза 2) — бонусная комната, баннер двери
 //  Эпик: H (Фаза 3) — нейтрализованная ловушка (Печать хранителя), кнопка артефакта
+//  Эпик: I (Фаза 4) — панель временного артефакта, подсветка revealed-клетки
 //  Зависит от: config.js, gen/room.js (clueAt), core/tomb.js, core/economy.js,
-//  core/run.js, core/keys.js, core/artifacts-permanent.js
+//  core/run.js, core/keys.js, core/artifacts-permanent.js, core/artifacts-temp.js
 //  Заменяет: render.js (renderGrid/render/flyCoin)
 // ───────────────────────────────────────────────
 const grid = $('grid');
@@ -31,7 +32,7 @@ function renderCells(){
   grid.style.gridTemplateColumns = `repeat(${rm.size}, 1fr)`;
   rm.cells.forEach((c, i) => {
     const d = document.createElement('div');
-    d.className = 'c' + (c.open ? ' open' : '');
+    d.className = 'c' + (c.open ? ' open' : (c.revealed ? ' revealed' : ''));
     if(c.open){
       if(c.type === 'trap'){
         if(c.neutralized){
@@ -122,6 +123,28 @@ function renderVaultBanner(){
   }
 }
 
+// Панель временного артефакта (Эпик I) — 1 слот, отдельный от постоянного
+// (artifact-ui.js). 'passive' (double_coin) — просто индикатор, сработает сам на
+// следующей монете. 'manual' (reveal_safe) — кнопка активации, может стоить золото.
+function renderTempArtifactBar(){
+  const el = $('tempArtifactBar');
+  if(!R.tempArtifact || R.inBonus){
+    el.style.display = 'none';
+    return;
+  }
+  const def = tempArtifactDef(R);
+  el.style.display = '';
+  if(def.trigger === 'manual'){
+    el.onclick = () => { activateTempArtifact(R); renderRoom(); };
+    el.disabled = !canActivateTempArtifact(R);
+    el.textContent = `${def.icon} ${def.name} — ${def.cost === 0 ? 'бесплатно' : def.cost + ' 🪙'}`;
+  } else {
+    el.onclick = null;
+    el.disabled = true;
+    el.textContent = `${def.icon} ${def.name} — сработает само`;
+  }
+}
+
 // Перерисовка HUD и сетки активной комнаты
 function renderRoom(){
   const rm = activeRoom();
@@ -143,6 +166,7 @@ function renderRoom(){
 
   renderVaultBanner();
   renderArtifactBar();
+  renderTempArtifactBar();
   renderCells();
   updateActionButton();
 }

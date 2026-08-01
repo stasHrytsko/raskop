@@ -4,8 +4,10 @@
 //  постоянного артефакта перехватывает tap()/onTrap()
 //  Эпик: E (Фаза 2) — ключ спрятан под случайной клеткой; тап маршрутизируется в
 //  бонусную комнату, пока R.inBonus
+//  Эпик: I (Фаза 4) — временный артефакт подбирается тапом как ключ; double_coin
+//  перехватывает начисление золота через goldWithTempBonus()
 //  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js,
-//  core/keys.js, core/wallet.js, core/artifacts-permanent.js
+//  core/keys.js, core/wallet.js, core/artifacts-permanent.js, core/artifacts-temp.js
 //  Заменяет: startLevel/nextDive/tap/onTrap/endDive/clearLevel/runOver из старого game.js
 // ───────────────────────────────────────────────
 let progress = { current: 0, cleared: 0 };  // прогресс кампании (localStorage)
@@ -32,6 +34,7 @@ function startLevel(n){
   R = { level: n, quota: quotaFor(n), gold: 0, tomb: newTomb(n), live: true };
   initKeyState(R);
   initArtifactState(R);
+  initTempArtifactState(R);
   renderRoom();
 }
 
@@ -56,9 +59,14 @@ function tap(i){
   if(cell.type === 'key'){
     R.hasKey = true;
     flyText(i, '🗝️ Ключ!');
+  } else if(cell.type === 'artifact'){
+    pickupTempArtifact(R, cell.artifactId);
+    const def = ARTIFACTS_TEMP.find(a => a.id === cell.artifactId);
+    flyText(i, `${def.icon} ${def.name}!`);
   } else {
-    addGold(R, 1);
-    flyText(i, '+1 🪙');
+    const amount = goldWithTempBonus(R, 1);
+    addGold(R, amount);
+    flyText(i, amount > 1 ? `+${amount} 🪙 ×2!` : '+1 🪙');
   }
   renderRoom();
 
