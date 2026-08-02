@@ -231,28 +231,49 @@ body{
 .legend .med::before{background:var(--amber)}
 .legend .hard::before{background:var(--danger)}
 
-/* ---------- сетка уровней 3×3 ---------- */
-.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:auto}
+/* ---------- карта кампании: тиры (Эпик L) ---------- */
+/* #levels — единственная скроллящаяся область экрана (mobile-first, tasks.md раздел 0):
+   заголовок/легенда/кнопки карты остаются на месте, крутится только список тиров. */
+.levels{
+  flex:1 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;gap:10px;margin-bottom:10px;
+}
+.tier-head{
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sand-dim);margin:2px 2px -2px;
+}
+.tier-row{
+  text-align:center;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+  font-size:13px;font-weight:700;
+}
+.tier-row.done{background:linear-gradient(155deg,rgba(70,176,106,.08),transparent);color:var(--green);opacity:.85}
+.tier-row.lock{color:var(--sand-dim);opacity:.45}
+
+/* ---------- сетка уровней активного тира (3 колонки, как раньше 3×3) ---------- */
+.levels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .lv{
   aspect-ratio:1;border-radius:16px;border:1.5px solid var(--line);
   background:linear-gradient(155deg,#2c2119,var(--earth-2) 60%,#1c140f);
   color:var(--sand);
   font-family:ui-monospace,Menlo,monospace;font-size:26px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;cursor:default;
   transition:transform .08s ease;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.05), inset 0 -3px 5px rgba(0,0,0,.4), 0 2px 0 rgba(0,0,0,.35);
   position:relative;
 }
-.lv{cursor:default}
 .lv.easy{border-color:var(--green);color:#88dca4}
 .lv.med{border-color:var(--amber);color:var(--amber)}
 .lv.hard{border-color:var(--danger);color:#e98b83}
 .lv.lock{opacity:.32}
 .lv.done{opacity:.9}
-.lv.done::after{content:"";position:absolute}
 .lv.current{
   box-shadow:inset 0 0 0 2px var(--sand), 0 0 14px rgba(242,163,60,.45), 0 2px 0 rgba(0,0,0,.35);
   transform:scale(1.05);
+}
+.lv.boss::before{
+  content:"👑";position:absolute;top:-7px;right:-5px;font-size:13px;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.6));
 }
 #screen-levels .btn-ghost{margin-top:14px}
 

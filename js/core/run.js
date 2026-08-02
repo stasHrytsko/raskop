@@ -6,8 +6,10 @@
 //  бонусную комнату, пока R.inBonus
 //  Эпик: I (Фаза 4) — временный артефакт подбирается тапом как ключ; double_coin
 //  перехватывает начисление золота через goldWithTempBonus()
-//  Зависит от: config.js, gen/rules.js, gen/room.js, core/tomb.js, core/economy.js,
-//  core/keys.js, core/wallet.js, core/artifacts-permanent.js, core/artifacts-temp.js
+//  Эпик: L (Фаза 5) — квота уровня берётся из CAMPAIGN[n].quota, не quotaFor(n)
+//  Зависит от: config.js, content/campaign.js, gen/rules.js, gen/room.js, core/tomb.js,
+//  core/economy.js, core/keys.js, core/wallet.js, core/artifacts-permanent.js,
+//  core/artifacts-temp.js
 //  Заменяет: startLevel/nextDive/tap/onTrap/endDive/clearLevel/runOver из старого game.js
 // ───────────────────────────────────────────────
 let progress = { current: 0, cleared: 0 };  // прогресс кампании (localStorage)
@@ -31,7 +33,7 @@ function isLastRoom(){ return R.tomb.currentRoomIndex >= R.tomb.rooms.length - 1
 function startLevel(n){
   progress.current = n;
   saveProgress();
-  R = { level: n, quota: quotaFor(n), gold: 0, tomb: newTomb(n), live: true };
+  R = { level: n, quota: CAMPAIGN[n].quota, gold: 0, tomb: newTomb(n), live: true };
   initKeyState(R);
   initArtifactState(R);
   initTempArtifactState(R);
@@ -70,8 +72,15 @@ function tap(i){
   }
   renderRoom();
 
-  // Все безопасные клетки комнаты открыты — комната исчерпана
-  if(rm.openedSafe >= rm.size * rm.size - rm.traps) setTimeout(onRoomCleared, 300);
+  // Все безопасные клетки комнаты открыты — комната исчерпана. Таймер даёт игроку
+  // увидеть последнюю открытую клетку перед авто-переходом/провалом; если игрок сам
+  // успевает нажать «Дальше →» раньше (кнопка кликабельна всё это время — комната
+  // не последняя, значит квота ещё не обязана быть набрана), rm перестаёт быть
+  // текущей комнатой — сверка по ссылке гасит устаревший таймер, не даёт ему
+  // ошибочно применить onRoomCleared() к уже другой (следующей) комнате.
+  if(rm.openedSafe >= rm.size * rm.size - rm.traps){
+    setTimeout(() => { if(curRoom() === rm) onRoomCleared(); }, 300);
+  }
 }
 
 // ─── тап в бонусной комнате (сокровищница): без ловушек, без честного старта, без ключей ───

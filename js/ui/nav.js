@@ -1,7 +1,7 @@
 // ───────────────────────────────────────────────
 //  Роутинг между экранами (правила / карта кампании / игра)
-//  Фаза 1 · Фаза 3 — строка кошелька на карте кампании
-//  Зависит от: config.js, core/run.js, core/wallet.js, content/artifacts-permanent.js
+//  Фаза 1 · Фаза 5 — карта кампании вынесена в ui/campaign-map.js (buildMap())
+//  Зависит от: config.js, ui/campaign-map.js
 //  Заменяет: js/nav.js (showScreen/buildMap/gotoMap/initNav)
 // ───────────────────────────────────────────────
 
@@ -11,45 +11,8 @@ function showScreen(name){
   $('screen-' + name).classList.add('active');
 }
 
-// Построить карту кампании (9 уровней, интерим до Эпика L) + прогресс + кнопки действий.
-// Карта не кликабельна — прогресс линейный, действия только через кнопки ниже.
-function buildMap(){
-  $('record').textContent = progress.cleared > 0
-    ? `Пройдено уровней: ${progress.cleared} / ${LEVELS_COUNT}`
-    : 'Прогресс: пока нет';
-  const artifactDef = wallet.artifact && ARTIFACTS_PERMANENT.find(a => a.id === wallet.artifact);
-  $('walletLine').textContent = `Кошелёк: ${wallet.gold} 🪙`
-    + (artifactDef ? ` · ${artifactDef.icon} ${artifactDef.name}` : '');
-
-  const wrap = $('levels');
-  wrap.innerHTML = '';
-  for(let i = 0; i < LEVELS_COUNT; i++){
-    const state = i < progress.cleared ? 'done' : (i === progress.current ? 'current' : 'lock');
-    const d = document.createElement('div');
-    d.className = 'lv ' + tierFor(i) + ' ' + state;
-    d.textContent = state === 'done' ? '✓' : (i + 1);
-    wrap.appendChild(d);
-  }
-
-  const act = $('mapActions');
-  const hasProgress = R || progress.current > 0 || progress.cleared > 0;
-  if(hasProgress){
-    const n = (R ? R.level : progress.current) + 1;
-    act.innerHTML =
-      `<button class="btn btn-go" id="resume">Продолжить · уровень ${n}</button>
-       <button class="btn btn-ghost" id="restart">Начать заново</button>`;
-    $('resume').onclick = () => {
-      if(!R) startLevel(progress.current);
-      showScreen('game');
-    };
-    $('restart').onclick = () => { resetProgress(); startLevel(0); showScreen('game'); };
-  } else {
-    act.innerHTML = `<button class="btn btn-go" id="startRun">Начать</button>`;
-    $('startRun').onclick = () => { startLevel(0); showScreen('game'); };
-  }
-}
-
-// Перейти на карту кампании, перестроив её под актуальный прогресс
+// Перейти на карту кампании, перестроив её под актуальный прогресс (buildMap — см.
+// ui/campaign-map.js)
 function gotoMap(){
   buildMap();
   showScreen('levels');

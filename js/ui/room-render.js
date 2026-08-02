@@ -149,9 +149,10 @@ function renderTempArtifactBar(){
 function renderRoom(){
   const rm = activeRoom();
   $('lvl').textContent = R.level + 1;
+  const bossBadge = CAMPAIGN[R.level].isBoss ? ' · 👑' : '';
   $('roomInfo').textContent = R.inBonus
     ? 'Сокровищница'
-    : `Комната ${R.tomb.currentRoomIndex + 1}/${R.tomb.rooms.length}`;
+    : `Комната ${R.tomb.currentRoomIndex + 1}/${R.tomb.rooms.length}${bossBadge}`;
 
   if(R.inBonus){
     $('roomTraps').textContent = 'Ловушек нет — чистый бонус';
