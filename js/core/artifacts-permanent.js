@@ -12,9 +12,15 @@ function initArtifactState(R){
   R.sealCharge = false;     // заряд Печати хранителя
 }
 
-// 1-е применение артефакта на уровне бесплатно, далее 1 → 2 → 4 (Эпик H)
+// 1-е применение артефакта на уровне бесплатно, далее 5 → 12 → 25 (пересчёт баланса —
+// concept.txt, «Активация»: лесенка под номинал монеты и квоту стандартного уровня,
+// старая 1/2/4 была рассчитана под квоту 8). 5-е и далее использование концепт не
+// оговаривает — продолжаем тем же темпом роста, что и на предыдущем шаге (×2).
+const ARTIFACT_COST_LADDER = [0, 5, 12, 25];
 function activationCost(useCount){
-  return useCount === 0 ? 0 : Math.pow(2, useCount - 1);
+  if(useCount < ARTIFACT_COST_LADDER.length) return ARTIFACT_COST_LADDER[useCount];
+  const overflow = useCount - ARTIFACT_COST_LADDER.length + 1;
+  return ARTIFACT_COST_LADDER[ARTIFACT_COST_LADDER.length - 1] * Math.pow(2, overflow);
 }
 
 function canActivateArtifact(R){

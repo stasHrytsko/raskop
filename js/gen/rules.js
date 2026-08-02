@@ -5,6 +5,18 @@
 //  Зависит от: config.js
 // ───────────────────────────────────────────────
 
+// Номинал золотой монеты 1–5 по весам (пересчёт баланса — concept.txt, «Золото и
+// баланс уровня» → «Номинал монеты»): среднее ≈2,0 (точно 2,03 при этих весах).
+const COIN_WEIGHTS = [40, 30, 20, 7, 3]; // вес номиналов 1..5, сумма 100
+function randomCoinValue(){
+  let r = Math.random() * 100;
+  for(let v = 0; v < COIN_WEIGHTS.length; v++){
+    if(r < COIN_WEIGHTS[v]) return v + 1;
+    r -= COIN_WEIGHTS[v];
+  }
+  return COIN_WEIGHTS.length; // защита от погрешности округления
+}
+
 // Перемешивание Фишера–Йетса
 function shuffle(a){
   for(let i = a.length - 1; i > 0; i--){
@@ -39,11 +51,14 @@ function safeNumbersOK(cells, size){
 // FIRST_TAP_BLANK: честный старт — у клетки i 0 ловушек среди соседей.
 // Любые ловушки в зоне старта (сама клетка + 8 соседей) переносятся на случайные
 // свободные клетки вне этой зоны. Вызывается при первом тапе в каждой комнате.
+// Цель переноса — строго `type==='gold'` (не «не ловушка»): `key`/`artifact` — тоже
+// не ловушка, но перенос ловушки НА такую клетку молча затирал бы находку без следа
+// (баг, найденный при регрессии пересчёта баланса — 5% прогонов теряли ключ).
 function clearStart(cells, i, size){
   if(!FIRST_TAP_BLANK) return;
   const zone = new Set([i, ...neigh(i, size)]);
   const free = [];
-  cells.forEach((c, j) => { if(!zone.has(j) && c.type !== 'trap') free.push(j); });
+  cells.forEach((c, j) => { if(!zone.has(j) && c.type === 'gold') free.push(j); });
   shuffle(free);
   let f = 0;
   zone.forEach(j => {

@@ -7,9 +7,12 @@
 //  Зависит от: config.js, gen/rules.js
 // ───────────────────────────────────────────────
 
-// Сырая комната: `traps` ловушек вразброс, остальные клетки — золото
+// Сырая комната: `traps` ловушек вразброс, остальные клетки — золото. Номинал
+// (`value`, 1–5) назначается всем клеткам сразу через randomCoinValue() — для клеток,
+// которые ниже станут `trap`/`key`/`artifact`, он остаётся неиспользуемым (читается
+// только для `type==='gold'` в `tap()`), проще, чем расставлять его отдельным проходом.
 function makeRawRoom(size, traps){
-  const cells = Array.from({length: size * size}, () => ({ type: 'gold', open: false }));
+  const cells = Array.from({length: size * size}, () => ({ type: 'gold', open: false, value: randomCoinValue() }));
   const idx = [...cells.keys()];
   shuffle(idx);
   for(let i = 0; i < traps; i++) cells[idx[i]].type = 'trap';

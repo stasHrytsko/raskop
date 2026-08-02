@@ -1,7 +1,7 @@
 // ───────────────────────────────────────────────
 //  Данные кампании — таблица уровней 1–100
-//  Эпик: L (tasks.md) · Фаза 5
-//  Зависит от: config.js (ROOM_SIZE, TRAPS_PER_ROOM, QUOTA_RATIO, safeCellsPerRoom)
+//  Эпик: L (tasks.md) · Фаза 5; квота — пересчёт баланса, Эпики B/N
+//  Зависит от: config.js (ROOM_SIZE, TRAPS_PER_ROOM)
 //  Заменяет: quotaFor()/roomsFor()/tierFor() из config.js (были плоские на 9 уровней)
 // ───────────────────────────────────────────────
 //
@@ -18,18 +18,30 @@
 // (Эпик E, открытый вопрос), постоянный магазин и 2-й слот артефакта (Эпик H,
 // открытый вопрос), проклятые находки (Эпик I, открытый вопрос), секторные комнаты
 // (Эпик K, не начат), особые тематические подсказки (Эпик J, не начат).
-
+//
+// Квота (`quota` в CAMPAIGN_TIERS) — из concept.txt, «Золото и баланс уровня» →
+// «Стартовый ориентир»: ≈60% от РЕАЛЬНОГО выноса игрока (8–12 вскрытых плит на
+// комнату, не всех 29 безопасных). Это не то же самое, что старая формула
+// `QUOTA_RATIO × roomCount × safeCellsPerRoom` (убрана) — та считала от теоретического
+// запаса комнаты, который при номинале монеты 1–5 (`gen/rules.js: randomCoinValue`) в
+// разы больше реального выноса. Значения по тиру: 2 комнаты → 13 (середина
+// заданных 12–15), 3 комнаты → 35 (дано точно), 4/5 комнат → 70/80 (края заданного
+// диапазона 70–80 для «4–5 комнат» — намеренно разные, не одно число: иначе у тиров
+// «Разнообразие/Маршруты» (4 комнаты) и «Комбинации/Мастерство» (5 комнат) вышла бы
+// одна и та же квота на разное число комнат). Ручной расчёт, не Монте-Карло — см.
+// tasks.md, Эпик N.
+//
 // Границы тиров (0-индекс, `to` включительно) + метаданные для карты кампании
 // (ui/campaign-map.js). `cls` — визуальный класс сложности, переиспользует
 // .lv.easy/.med/.hard из прежней сетки 3×3: 7 тиров сгруппированы в 3 цвета легенды.
 const CAMPAIGN_TIERS = [
-  { id: 'novice',  label: 'Обучение',        from: 0,  to: 2,  cls: 'easy', roomCount: 2, keys: false, temp: false },
-  { id: 'core',    label: 'Чистое ядро',     from: 3,  to: 14, cls: 'easy', roomCount: 3, keys: false, temp: false },
-  { id: 'keys',    label: 'Ключи и тайники', from: 15, to: 29, cls: 'med',  roomCount: 3, keys: true,  temp: false },
-  { id: 'variety', label: 'Разнообразие',    from: 30, to: 49, cls: 'med',  roomCount: 4, keys: true,  temp: true  },
-  { id: 'routes',  label: 'Маршруты',        from: 50, to: 69, cls: 'hard', roomCount: 4, keys: true,  temp: true  },
-  { id: 'combo',   label: 'Комбинации',      from: 70, to: 89, cls: 'hard', roomCount: 5, keys: true,  temp: true  },
-  { id: 'mastery', label: 'Мастерство',      from: 90, to: 99, cls: 'hard', roomCount: 5, keys: true,  temp: true  },
+  { id: 'novice',  label: 'Обучение',        from: 0,  to: 2,  cls: 'easy', roomCount: 2, quota: 13, keys: false, temp: false },
+  { id: 'core',    label: 'Чистое ядро',     from: 3,  to: 14, cls: 'easy', roomCount: 3, quota: 35, keys: false, temp: false },
+  { id: 'keys',    label: 'Ключи и тайники', from: 15, to: 29, cls: 'med',  roomCount: 3, quota: 35, keys: true,  temp: false },
+  { id: 'variety', label: 'Разнообразие',    from: 30, to: 49, cls: 'med',  roomCount: 4, quota: 70, keys: true,  temp: true  },
+  { id: 'routes',  label: 'Маршруты',        from: 50, to: 69, cls: 'hard', roomCount: 4, quota: 70, keys: true,  temp: true  },
+  { id: 'combo',   label: 'Комбинации',      from: 70, to: 89, cls: 'hard', roomCount: 5, quota: 80, keys: true,  temp: true  },
+  { id: 'mastery', label: 'Мастерство',      from: 90, to: 99, cls: 'hard', roomCount: 5, quota: 80, keys: true,  temp: true  },
 ];
 
 function tierOf(n){
@@ -38,16 +50,20 @@ function tierOf(n){
 
 // Каждый 10-й уровень (10, 20, ..., 100) — босс: гробница на комнату больше, чем у
 // тира (единственная реализованная разница — «большая гробница», не новая механика,
-// как и требует tasks.md: "не на новую механику").
+// как и требует tasks.md: "не на новую механику"). Квота босса масштабируется от
+// квоты своего тира пропорционально лишней комнате (tier.quota/tier.roomCount —
+// «цена одной комнаты» этого тира, округляется), а не берётся из соседнего тира —
+// там другое число комнат и другая база.
 const CAMPAIGN = Array.from({ length: 100 }, (_, n) => {
   const tier = tierOf(n);
   const isBoss = (n + 1) % 10 === 0;
   const roomCount = tier.roomCount + (isBoss ? 1 : 0);
+  const quota = isBoss ? Math.round(tier.quota / tier.roomCount * roomCount) : tier.quota;
   return {
     n,
     tierId: tier.id,
     roomCount,
-    quota: Math.round(QUOTA_RATIO * roomCount * safeCellsPerRoom),
+    quota,
     isBoss,
     keysEnabled: tier.keys,
     tempArtifactsEnabled: tier.temp,

@@ -7,6 +7,8 @@
 //  Эпик: I (Фаза 4) — временный артефакт подбирается тапом как ключ; double_coin
 //  перехватывает начисление золота через goldWithTempBonus()
 //  Эпик: L (Фаза 5) — квота уровня берётся из CAMPAIGN[n].quota, не quotaFor(n)
+//  Пересчёт баланса (Эпик C) — золотая клетка даёт cell.value (номинал 1–5), не
+//  флет 1; и в основной комнате (tap()), и в бонусной (tapBonus())
 //  Зависит от: config.js, content/campaign.js, gen/rules.js, gen/room.js, core/tomb.js,
 //  core/economy.js, core/keys.js, core/wallet.js, core/artifacts-permanent.js,
 //  core/artifacts-temp.js
@@ -66,9 +68,10 @@ function tap(i){
     const def = ARTIFACTS_TEMP.find(a => a.id === cell.artifactId);
     flyText(i, `${def.icon} ${def.name}!`);
   } else {
-    const amount = goldWithTempBonus(R, 1);
+    const base = cell.value;
+    const amount = goldWithTempBonus(R, base);
     addGold(R, amount);
-    flyText(i, amount > 1 ? `+${amount} 🪙 ×2!` : '+1 🪙');
+    flyText(i, amount > base ? `+${amount} 🪙 ×2!` : `+${amount} 🪙`);
   }
   renderRoom();
 
@@ -90,8 +93,8 @@ function tapBonus(i){
   if(cell.open) return;
   cell.open = true;
   rm.openedSafe++;
-  addGold(R, 1);
-  flyText(i, '+1 🪙');
+  addGold(R, cell.value);
+  flyText(i, `+${cell.value} 🪙`);
   renderRoom();
 }
 
